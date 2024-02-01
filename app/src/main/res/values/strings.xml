@@ -1,3 +1,19 @@
 <resources>
     <string name="app_name">Real Estate Manager</string>
+
+
+    <string name="no_result">No results found</string>
+
+    <string name="map">Map</string>
+
+    <string name="caption">Caption</string>
+    <string name="description">Description</string>
+    <string name="save">Save</string>
+
+    <string name="internet_is_required">Internet is required for this feature</string>
+
+    <string name="new_button">New</string>
+    <string name="sell_button">Mark as Sold</string>
+    <string name="search_button">Search</string>
+    <string name="edit_button">Edit</string>
 </resources>
