@@ -1,6 +1,7 @@
 package com.openclassrooms.realestatemanager.ui;
 
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Intent;
@@ -18,21 +19,25 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import com.openclassrooms.realestatemanager.Manifest;
+
 import com.openclassrooms.realestatemanager.R;
 import com.openclassrooms.realestatemanager.RealEstateEditor;
-import com.openclassrooms.realestatemanager.Utils;
+import com.openclassrooms.realestatemanager.utils.Utils;
 import com.openclassrooms.realestatemanager.databinding.ActivityMainBinding;
 import com.openclassrooms.realestatemanager.models.RealEstate;
 import com.openclassrooms.realestatemanager.viewModel.RealEstateViewModel;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
 
     private RealEstateViewModel viewModel;
+
+    private final List<RealEstate> realEstateList = new ArrayList<>();
 
     private RealEstate realEstate;
 
@@ -100,21 +105,21 @@ public class MainActivity extends AppCompatActivity {
 
     private void editRealEstate() {
         Intent intent = new Intent(this, RealEstateEditor.class);
-        intent.putExtra("REAL_ESTATE", realEstate);
-        mEditRealEstateLauncher.launch(intent);
+        //intent.putExtra("REAL_ESTATE", realEstate);
+        editRealEstateLauncher.launch(intent);
     }
 
     private void createNewRealEstate() {
         Intent intent = new Intent(this, RealEstateEditor.class);
-        mEditRealEstateLauncher.launch(intent);
+        editRealEstateLauncher.launch(intent);
     }
 
     private void sellRealEstate() {
         Calendar cal = Calendar.getInstance();
         DatePickerDialog datePickerDialog = new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
             cal.set(year, month, dayOfMonth);
-            realEstate.setSaleDate(cal.getTime());
-            viewModel.createOrUpdateRealEstate(realEstate);
+           // realEstate.setSaleDate(cal.getTime());
+            //viewModel.createOrUpdateRealEstate(realEstate);
         }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
         datePickerDialog.show();
     }
@@ -123,8 +128,8 @@ public class MainActivity extends AppCompatActivity {
         if (filtered) {
             startActivity(new Intent(this, MainActivity.class));
         } else {
-            SearchModal searchModal = new SearchModal();
-            searchModal.show(getSupportFragmentManager(), "searchModal");
+            //SearchModal searchModal = new SearchModal();
+            //searchModal.show(getSupportFragmentManager(), "searchModal");
         }
     }
 
@@ -143,14 +148,32 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    private final ActivityResultLauncher<Intent> mEditRealEstateLauncher =
+    private final ActivityResultLauncher<Intent> editRealEstateLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
                     result -> {
                         if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
                             RealEstate editedEstate = result.getData().getParcelableExtra("EDITED_REAL_ESTATE");
-                            viewModel.createOrUpdateRealEstate(editedEstate);
-                            realEstate.clone(editedEstate);
-                            realEstate.get(realEstate.indexOf(editedEstate)).clone(editedEstate);
+
+                            // Mettre à jour ou ajouter de nouveaux médias
+                            viewModel.addNewMedia(editedEstate, editedEstate.getId());
+
+                            // Mettre à jour l'URL du média en vedette si nécessaire
+                            // viewModel.updateEstateFeaturedMediaUrl(ancienneUrl, nouvelleUrl);
+
+                            // Mise à jour de l'objet RealEstate dans votre liste locale si nécessaire
+                            // Vous devez trouver l'objet RealEstate correspondant dans votre liste et le mettre à jour
+                            updateLocalRealEstateList(editedEstate);
                         }
                     });
+
+    private void updateLocalRealEstateList(RealEstate editedEstate) {
+        for (int i = 0; i < realEstateList.size(); i++) {
+            if (realEstateList.get(i).getId() == editedEstate.getId()) {
+                realEstateList.set(i, editedEstate);
+                break;
+            }
+        }
+    }
+
+
 }
