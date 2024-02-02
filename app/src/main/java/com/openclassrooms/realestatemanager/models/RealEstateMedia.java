@@ -175,5 +175,14 @@ public class RealEstateMedia implements Parcelable {
         parcel.writeString(firestoreUrl);
     }
 
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+
 
 }
