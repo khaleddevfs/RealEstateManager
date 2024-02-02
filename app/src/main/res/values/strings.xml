@@ -16,4 +16,6 @@
     <string name="sell_button">Mark as Sold</string>
     <string name="search_button">Search</string>
     <string name="edit_button">Edit</string>
+    <string name="price">%d €</string>
+    <string name="sold">Sold : %s</string>
 </resources>

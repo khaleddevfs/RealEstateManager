@@ -33,7 +33,7 @@ public interface RealEstateDao {
     void insertMultipleRealEstates(List<RealEstate> realEstates);
 
     // Obtenir un bien immobilier par son ID avec un curseur
-    @Query("SELECT * FROM RealEstate WHERE id = :id")// j'ai mis  id a la place de mId
+    @Query("SELECT * FROM RealEstate WHERE id = :id")
     Cursor getRealEstateWithCursor(long id);
 
     // Filtrer les biens immobiliers selon divers critères

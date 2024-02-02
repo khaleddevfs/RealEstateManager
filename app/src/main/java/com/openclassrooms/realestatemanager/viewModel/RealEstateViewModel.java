@@ -27,6 +27,8 @@ public class RealEstateViewModel extends ViewModel {
         this.executor = executor;
     }
 
+
+
     public LiveData<List<RealEstate>> getRealEstates() {
         return realEstateRepo.getAllRealEstates();
     }

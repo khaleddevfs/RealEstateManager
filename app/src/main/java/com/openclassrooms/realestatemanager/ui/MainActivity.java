@@ -6,7 +6,10 @@ import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,10 +21,14 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProvider;
 
 
 import com.openclassrooms.realestatemanager.R;
 import com.openclassrooms.realestatemanager.RealEstateEditor;
+import com.openclassrooms.realestatemanager.adapters.RealEstateAdapter;
+import com.openclassrooms.realestatemanager.adapters.RealEstateViewHolder;
+import com.openclassrooms.realestatemanager.injection.ViewModelFactory;
 import com.openclassrooms.realestatemanager.utils.Utils;
 import com.openclassrooms.realestatemanager.databinding.ActivityMainBinding;
 import com.openclassrooms.realestatemanager.models.RealEstate;
@@ -30,24 +37,148 @@ import com.openclassrooms.realestatemanager.viewModel.RealEstateViewModel;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
-
     private RealEstateViewModel viewModel;
-
     private final List<RealEstate> realEstateList = new ArrayList<>();
-
     private RealEstate realEstate;
-
     private boolean filtered = false;
+    private boolean shouldObserve = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         initView();
+        initViewModel();
+        processIntent(getIntent());
+    }
+
+    private void initView() {
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+    }
+
+    private void initViewModel() {
+        viewModel = new ViewModelProvider(this, ViewModelFactory.getInstance(this.getApplicationContext())).get(RealEstateViewModel.class);
+
+    }
+
+    private void processIntent(Intent intent) {
+        if (isFilteredIntent(intent)) {
+            handleFilteredEstates(intent);
+        } else {
+            observeRealEstates();
+        }
+    }
+
+    private boolean isFilteredIntent(Intent intent) {
+        return intent.getParcelableArrayListExtra("filteredEstates") != null;
+    }
+
+    private void handleFilteredEstates(Intent intent) {
+        realEstateList.clear();
+        realEstateList.addAll(intent.getParcelableArrayListExtra("filteredEstates"));
+        Log.d("TAG", "FILTERED ");
+        updateEstates();
+        filtered = true;
+    }
+
+    private void updateEstates() {
+        setRealEstateClickListener();
+        updateRealEstateList();
+        updateDetailViewVisibility();
+        syncDatabase();
+    }
+
+    private void setRealEstateClickListener() {
+        binding.realEstateListRv.setAdapter(new RealEstateAdapter(realEstateList, position -> {
+            RealEstate selectedEstate = realEstateList.get(position);
+            handleRealEstateClick(selectedEstate);
+        }));
+    }
+
+    private void handleRealEstateClick(RealEstate estate) {
+        this.realEstate = estate;
+        if (binding.detailViewContainer.getVisibility() == View.VISIBLE) {
+            showDetailsFragment();
+        } else {
+            navigateToSupportActivity();
+        }
+    }
+
+    private void showDetailsFragment() {
+       /* Bundle bundle = new Bundle();
+        bundle.putParcelable("REAL_ESTATE", realEstate);
+        DetailsFragment fragment = new DetailsFragment();
+        fragment.setArguments(bundle);
+        updateActionBar();
+        getSupportFragmentManager().beginTransaction()
+                .replace(mBinding.FragmentContainer.getId(), fragment)
+                .commit();
+
+        */
+    }
+
+    private void navigateToSupportActivity() {
+        /*Intent intent = new Intent(this, SupportActivity.class);
+        intent.putExtra("REAL_ESTATE", realEstate);
+        startActivity(intent);
+        finish();
+
+         */
+    }
+
+
+    private void updateRealEstateList() {
+        // Additional logic if required
+    }
+
+    private void updateActionBar() {
+        int color = realEstate.getSaleDate() != null ? Color.RED : Color.BLUE;
+        String title = realEstate.getName();
+        if (realEstate.getSaleDate() != null) {
+            title += " " + getString(R.string.sold, realEstate.getSaleDate());
+        }
+        Objects.requireNonNull(getSupportActionBar()).setBackgroundDrawable(new ColorDrawable(color));
+        getSupportActionBar().setTitle(title);
+    }
+
+
+
+
+    private void updateDetailViewVisibility() {
+        boolean isTablet = Utils.isDeviceTablet(getApplicationContext());
+        binding.detailViewContainer.setVisibility(isTablet ? View.VISIBLE : View.GONE);
+        binding.noResultsTextView.setVisibility(isTablet && realEstateList.isEmpty() ? View.VISIBLE : View.GONE);
+    }
+
+    private void syncDatabase() {
+        // Logic for SyncDB
+    }
+
+
+    private void observeRealEstates() {
+        viewModel.getRealEstates().observe(this, this::getEstatesObserver);
+        filtered = false;
+        Log.d("TAG", "PAS FILTERED ");
+    }
+
+    private void getEstatesObserver(List<RealEstate> realEstates) {
+        if(shouldObserve) {
+            shouldObserve = false;
+            realEstateList.clear();
+            realEstateList.addAll(realEstates);
+
+            if (realEstateList.size() > 0)
+                updateEstates();
+
+          //  checkFirestore();
+
+
+        }
     }
 
     @Override
@@ -75,11 +206,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void initView() {
-        binding = ActivityMainBinding.inflate(getLayoutInflater());
-        View view = binding.getRoot();
-        setContentView(view);
-    }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
@@ -118,7 +244,7 @@ public class MainActivity extends AppCompatActivity {
         Calendar cal = Calendar.getInstance();
         DatePickerDialog datePickerDialog = new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
             cal.set(year, month, dayOfMonth);
-           // realEstate.setSaleDate(cal.getTime());
+            realEstate.setSaleDate(cal.getTime());
             //viewModel.createOrUpdateRealEstate(realEstate);
         }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
         datePickerDialog.show();
@@ -155,7 +281,7 @@ public class MainActivity extends AppCompatActivity {
                             RealEstate editedEstate = result.getData().getParcelableExtra("EDITED_REAL_ESTATE");
 
                             // Mettre à jour ou ajouter de nouveaux médias
-                            viewModel.addNewMedia(editedEstate, editedEstate.getId());
+                            viewModel.addNewMedia(editedEstate, editedEstate.getID());
 
                             // Mettre à jour l'URL du média en vedette si nécessaire
                             // viewModel.updateEstateFeaturedMediaUrl(ancienneUrl, nouvelleUrl);
@@ -168,7 +294,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateLocalRealEstateList(RealEstate editedEstate) {
         for (int i = 0; i < realEstateList.size(); i++) {
-            if (realEstateList.get(i).getId() == editedEstate.getId()) {
+            if (realEstateList.get(i).getID() == editedEstate.getID()) {
                 realEstateList.set(i, editedEstate);
                 break;
             }
