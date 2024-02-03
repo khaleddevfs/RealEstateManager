@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.openclassrooms.realestatemanager" />
+                  <option name="mobileSdkAppId" value="1:441076026302:android:5bba2e565aee7c1c6f87ef" />
+                  <option name="projectId" value="real-estate-manager-c3f33" />
+                  <option name="projectNumber" value="441076026302" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

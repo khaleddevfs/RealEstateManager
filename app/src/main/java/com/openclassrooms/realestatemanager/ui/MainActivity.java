@@ -5,14 +5,18 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ScrollView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -21,6 +25,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
 
@@ -28,12 +33,15 @@ import com.openclassrooms.realestatemanager.R;
 import com.openclassrooms.realestatemanager.RealEstateEditor;
 import com.openclassrooms.realestatemanager.adapters.RealEstateAdapter;
 import com.openclassrooms.realestatemanager.adapters.RealEstateViewHolder;
+import com.openclassrooms.realestatemanager.fragments.DetailsFragment;
 import com.openclassrooms.realestatemanager.injection.ViewModelFactory;
 import com.openclassrooms.realestatemanager.utils.Utils;
 import com.openclassrooms.realestatemanager.databinding.ActivityMainBinding;
 import com.openclassrooms.realestatemanager.models.RealEstate;
 import com.openclassrooms.realestatemanager.viewModel.RealEstateViewModel;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -48,13 +56,40 @@ public class MainActivity extends AppCompatActivity {
     private boolean filtered = false;
     private boolean shouldObserve = true;
 
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initView();
         initViewModel();
         processIntent(getIntent());
+        ScrollView();
+
     }
+
+    private void ScrollView() {
+        ScrollView detailViewContainer = binding.detailViewContainer;
+        if (Utils.isDeviceTablet(getApplicationContext())) {
+            detailViewContainer.setVisibility(View.VISIBLE);
+            if(!realEstateList.isEmpty()) {
+                binding.noResultsTextView.setVisibility(View.GONE);
+                //     onRealEstateClickListener.OnRealEstateClick(0);
+
+            } else {
+                binding.noResultsTextView.setVisibility(View.VISIBLE);
+            }
+
+        } else {
+            detailViewContainer.setVisibility(View.GONE);
+
+        }
+
+        setContentView(binding.getRoot());
+        syncDatabase();
+    }
+
 
     private void initView() {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
@@ -91,6 +126,32 @@ public class MainActivity extends AppCompatActivity {
         updateRealEstateList();
         updateDetailViewVisibility();
         syncDatabase();
+        ScrollView();
+        ConfigureDetailsFragment();
+    }
+
+    private void ConfigureDetailsFragment() {
+        if (binding.detailViewContainer.getVisibility() == View.VISIBLE) {
+            Bundle bundle = new Bundle();
+            bundle.putParcelable("REAL_ESTATE", realEstate);
+            DetailsFragment fragment = new DetailsFragment();
+
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+         //   fragment.setArguments(bundle);
+            int color = Color.BLUE;
+            String title = realEstate.getName();
+            if (realEstate.getSaleDate() != null) {
+                color = Color.RED;
+                title += " " + getString(R.string.sold, realEstate.getSaleDate());
+            }
+            Objects.requireNonNull(getSupportActionBar()).setBackgroundDrawable(new ColorDrawable(color));
+            getSupportActionBar().setTitle(title);
+
+
+            //transaction.replace(binding.FragmentContainer.getId(), fragment);
+            transaction.commit();
+
+    }
     }
 
     private void setRealEstateClickListener() {
@@ -105,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
         if (binding.detailViewContainer.getVisibility() == View.VISIBLE) {
             showDetailsFragment();
         } else {
-            navigateToSupportActivity();
+           // navigateToSupportActivity();
         }
     }
 
@@ -122,14 +183,9 @@ public class MainActivity extends AppCompatActivity {
         */
     }
 
-    private void navigateToSupportActivity() {
-        /*Intent intent = new Intent(this, SupportActivity.class);
-        intent.putExtra("REAL_ESTATE", realEstate);
-        startActivity(intent);
-        finish();
 
-         */
-    }
+
+
 
 
     private void updateRealEstateList() {
@@ -231,13 +287,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void editRealEstate() {
         Intent intent = new Intent(this, RealEstateEditor.class);
-        //intent.putExtra("REAL_ESTATE", realEstate);
+        intent.putExtra("REAL_ESTATE", realEstate);
         editRealEstateLauncher.launch(intent);
     }
 
     private void createNewRealEstate() {
         Intent intent = new Intent(this, RealEstateEditor.class);
         editRealEstateLauncher.launch(intent);
+
     }
 
     private void sellRealEstate() {
@@ -270,6 +327,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             Toast.makeText(this, getString(R.string.internet_is_required), Toast.LENGTH_LONG).show();
         }
+        Log.d("lodi", "showMap"  );
     }
 
 

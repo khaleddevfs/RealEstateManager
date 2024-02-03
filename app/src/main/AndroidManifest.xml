@@ -14,11 +14,30 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyCpWVbw3qFliTTITDAo1XobSgXcPhccry4" />
+
+
+        <provider
+            android:name=".provider.RealEstateContentProvider"
+            android:authorities="com.openclassrooms.realestatemanager.provider"
+            android:exported="true" />
+        <provider
+            android:name=".provider.RealEstateMediaContentProvider"
+            android:authorities="com.openclassrooms.realestatemanager.provider"
+            android:exported="true" />
 
         <activity
             android:name=".SecondActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".ui.MapActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.openclassrooms.realestatemanager.RealEstateEditor"
+            android:exported="false" />
         <activity
             android:name="com.openclassrooms.realestatemanager.ui.MainActivity"
             android:exported="true">

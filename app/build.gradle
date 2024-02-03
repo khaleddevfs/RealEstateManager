@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+       'com.google.gms.google-services'
 
 android {
     namespace = "com.openclassrooms.realestatemanager"
@@ -92,6 +93,18 @@ dependencies {
 
     // FIREBASE UI
     implementation 'com.firebaseui:firebase-ui-auth:8.0.2'
+
+
+    //Google
+
+    implementation 'com.google.maps.android:android-maps-utils:3.8.2'
+    implementation 'com.google.android.gms:play-services-location:21.1.0'
+    implementation 'com.google.android.libraries.places:places:3.3.0'
+
+
+    // EasyPermissions
+
+    implementation 'pub.devrel:easypermissions:3.0.0'
 
 
 }

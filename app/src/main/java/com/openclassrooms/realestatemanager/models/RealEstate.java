@@ -127,6 +127,9 @@ import androidx.room.PrimaryKey;
 
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -251,6 +254,7 @@ public class RealEstate implements Parcelable {
         }
     };
 
+
     public String getJsonPoint() {
         return jsonPoint;
     }
@@ -258,6 +262,33 @@ public class RealEstate implements Parcelable {
     public void setJsonPoint(String jsonPoint) {
         jsonPoint = jsonPoint;
     }
+
+
+
+    public double getLatitude() {
+        try {
+            JSONObject jsonObject = new JSONObject(jsonPoint);
+            return jsonObject.optDouble("latitude", 0.0);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return 0.0;
+        }
+    }
+
+    /**
+     * Extrait la longitude à partir du champ jsonPoint.
+     * @return La longitude, ou 0.0 si jsonPoint est mal formé ou inexistant.
+     */
+    public double getLongitude() {
+        try {
+            JSONObject jsonObject = new JSONObject(jsonPoint);
+            return jsonObject.optDouble("longitude", 0.0);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return 0.0;
+        }
+    }
+
 
 
 
@@ -524,7 +555,7 @@ public class RealEstate implements Parcelable {
 
         if(values.containsKey("name")) estate.setName(values.getAsString("name"));
 
-        if(values.containsKey("jsonPoint")) estate.setJsonPoint(values.getAsString("jsonPoint"));
+       // if(values.containsKey("jsonPoint")) estate.setJsonPoint(values.getAsString("jsonPoint"));
 
         if(values.containsKey("region")) estate.setRegion(values.getAsString("region"));
 
