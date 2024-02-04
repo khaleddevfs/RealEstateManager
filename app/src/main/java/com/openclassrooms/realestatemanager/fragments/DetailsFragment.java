@@ -1,4 +1,6 @@
 package com.openclassrooms.realestatemanager.fragments;
 
-public class DetailsFragment {
+import androidx.fragment.app.Fragment;
+
+public class DetailsFragment extends Fragment {
 }

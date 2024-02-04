@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Real Estate Manager</string>
 
-
+    <string name="todo">TODO</string>
     <string name="no_result">No results found</string>
 
     <string name="map">Map</string>

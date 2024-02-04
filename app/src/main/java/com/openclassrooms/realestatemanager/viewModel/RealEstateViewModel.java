@@ -37,7 +37,7 @@ public class RealEstateViewModel extends ViewModel {
         return realEstateMediaRepo.getRealEstateMediaByRealEstateId(id);
     }
 
-    /*public void createOrUpdateRealEstate(RealEstate estate) {
+    public void createOrUpdateRealEstate(RealEstate estate) {
         executor.execute(() -> {
             long id = realEstateRepo.createOrUpdateRealEstate(estate);
             Log.d("TAG", "createOrUpdateRealEstate: ID: " + estate.getID() + ", New ID: " + id);
@@ -47,7 +47,7 @@ public class RealEstateViewModel extends ViewModel {
         });
     }
 
-     */
+
 
     public void deleteAssociatedMedia(long realEstateId) {
         executor.execute(() -> realEstateMediaRepo.deleteAllMediaByRealEstateID(realEstateId));

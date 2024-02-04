@@ -75,15 +75,13 @@ public class MainActivity extends AppCompatActivity {
             detailViewContainer.setVisibility(View.VISIBLE);
             if(!realEstateList.isEmpty()) {
                 binding.noResultsTextView.setVisibility(View.GONE);
-                //     onRealEstateClickListener.OnRealEstateClick(0);
-
+                // Utilisez le premier élément de la liste comme exemple
+                handleRealEstateClick(realEstateList.get(0));
             } else {
                 binding.noResultsTextView.setVisibility(View.VISIBLE);
             }
-
         } else {
             detailViewContainer.setVisibility(View.GONE);
-
         }
 
         setContentView(binding.getRoot());
@@ -137,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
             DetailsFragment fragment = new DetailsFragment();
 
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-         //   fragment.setArguments(bundle);
+            fragment.setArguments(bundle);
             int color = Color.BLUE;
             String title = realEstate.getName();
             if (realEstate.getSaleDate() != null) {
@@ -148,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
             getSupportActionBar().setTitle(title);
 
 
-            //transaction.replace(binding.FragmentContainer.getId(), fragment);
+            transaction.replace(binding.FragmentContainer.getId(), fragment);
             transaction.commit();
 
     }
@@ -166,8 +164,11 @@ public class MainActivity extends AppCompatActivity {
         if (binding.detailViewContainer.getVisibility() == View.VISIBLE) {
             showDetailsFragment();
         } else {
-           // navigateToSupportActivity();
+            navigateToSupportActivity();
         }
+    }
+
+    private void navigateToSupportActivity() {
     }
 
     private void showDetailsFragment() {
@@ -302,7 +303,7 @@ public class MainActivity extends AppCompatActivity {
         DatePickerDialog datePickerDialog = new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
             cal.set(year, month, dayOfMonth);
             realEstate.setSaleDate(cal.getTime());
-            //viewModel.createOrUpdateRealEstate(realEstate);
+            viewModel.createOrUpdateRealEstate(realEstate);
         }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
         datePickerDialog.show();
     }
