@@ -26,10 +26,13 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
 
+import com.bumptech.glide.load.resource.bitmap.CircleCrop;
+import com.google.android.material.navigation.NavigationView;
 import com.openclassrooms.realestatemanager.R;
 import com.openclassrooms.realestatemanager.RealEstateEditor;
 import com.openclassrooms.realestatemanager.adapters.RealEstateAdapter;
@@ -49,7 +52,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private ActivityMainBinding binding;
     private RealEstateViewModel viewModel;
@@ -58,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean filtered = false;
     private boolean shouldObserve = true;
 
-
+    private boolean isTwoPaneLayout; // Pour détecter si l'appareil est une tablette
 
 
     @Override
@@ -67,21 +70,58 @@ public class MainActivity extends AppCompatActivity {
         initView();
         initViewModel();
         configureUI();
-        processIntent(getIntent());
+        // processIntent(getIntent());
 
 
+        // Déterminer si l'appareil est une tablette
+        isTwoPaneLayout = getResources().getBoolean(R.bool.isTablet);
 
+        if (isTwoPaneLayout) {
+            // Logique pour la tablette
+            setupTabletView();
+        } else {
+            // Logique pour le téléphone
+            setupPhoneView();
+        }
 
-        // connecting MapsFragment with activity
-
+        // Configurer le bouton FAB pour ajouter un nouveau RealEstate
+        setupFabButton();
+/*
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.main_frame_layout, new ListFragment(realEstateList))
+                .replace(R.id.main_frame_layout, ListFragment.newInstance(realEstateList))
                 .commit();
+
+        Log.d("lodi", "go to ListFragment");*/
 
     }
 
 
+    private void setupTabletView() {
+        // Afficher ListFragment et DetailsFragment côte à côte
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.list_fragment_container, ListFragment.newInstance(realEstateList))
+                .replace(R.id.details_fragment_container, new DetailsFragment())
+                .commit();
+    }
+
+    private void setupPhoneView() {
+        // Afficher uniquement ListFragment
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.main_frame_layout, ListFragment.newInstance(realEstateList))
+                .commit();
+    }
+
+    private void setupFabButton() {
+        binding.fabAddRealEstate.setOnClickListener(view -> createNewRealEstate());
+    }
+
+    private void createNewRealEstate() {
+        Intent intent = new Intent(this, RealEstateEditor.class);
+        editRealEstateLauncher.launch(intent);
+    }
 
 
     private void initView() {
@@ -98,9 +138,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void configureUI() {
         this.configureToolbar();
+        configureNavigationView();
         this.configureDrawerLayout();
     }
-
 
 
     private void configureToolbar() {
@@ -115,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
         binding.mainDrawerLayout.addDrawerListener(toggle);
         toggle.syncState();
     }
-
+/*
     private void processIntent(Intent intent) {
         if (isFilteredIntent(intent)) {
             handleFilteredEstates(intent);
@@ -134,97 +174,6 @@ public class MainActivity extends AppCompatActivity {
       //  updateEstates();
         filtered = true;
     }
-  /*
-    private void updateEstates() {
-        setRealEstateClickListener();
-        updateRealEstateList();
-        updateDetailViewVisibility();
-        syncDatabase();
-        ScrollView();
-        ConfigureDetailsFragment();
-    }
-
-  private void ConfigureDetailsFragment() {
-        if (binding.detailViewContainer.getVisibility() == View.VISIBLE) {
-            Bundle bundle = new Bundle();
-            bundle.putParcelable("REAL_ESTATE", realEstate);
-            DetailsFragment fragment = new DetailsFragment();
-
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            fragment.setArguments(bundle);
-            int color = Color.BLUE;
-            String title = realEstate.getName();
-            if (realEstate.getSaleDate() != null) {
-                color = Color.RED;
-                title += " " + getString(R.string.sold, realEstate.getSaleDate());
-            }
-            Objects.requireNonNull(getSupportActionBar()).setBackgroundDrawable(new ColorDrawable(color));
-            getSupportActionBar().setTitle(title);
-
-
-            transaction.replace(binding.FragmentContainer.getId(), fragment);
-            transaction.commit();
-
-    }
-    }
-
-
-
-    private void setRealEstateClickListener() {
-        binding.realEstateListRv.setAdapter(new RealEstateAdapter(realEstateList, position -> {
-            RealEstate selectedEstate = realEstateList.get(position);
-            handleRealEstateClick(selectedEstate);
-        }));
-    }
-
-    private void handleRealEstateClick(RealEstate estate) {
-        this.realEstate = estate;
-        if (binding.detailViewContainer.getVisibility() == View.VISIBLE) {
-            showDetailsFragment();
-        } else {
-            navigateToSupportActivity();
-        }
-    }
-
-    private void navigateToSupportActivity() {
-    }
-
-
-
-    private void showDetailsFragment() {
-       Bundle bundle = new Bundle();
-        bundle.putParcelable("REAL_ESTATE", realEstate);
-        DetailsFragment fragment = new DetailsFragment();
-        fragment.setArguments(bundle);
-        updateActionBar();
-        getSupportFragmentManager().beginTransaction()
-                .replace(mBinding.FragmentContainer.getId(), fragment)
-                .commit();
-
-
-    }
-
-
-
-
-
-
-    private void updateRealEstateList() {
-        // Additional logic if required
-    }
-
-    private void updateActionBar() {
-        int color = realEstate.getSaleDate() != null ? Color.RED : Color.BLUE;
-        String title = realEstate.getName();
-        if (realEstate.getSaleDate() != null) {
-            title += " " + getString(R.string.sold, realEstate.getSaleDate());
-        }
-        Objects.requireNonNull(getSupportActionBar()).setBackgroundDrawable(new ColorDrawable(color));
-        getSupportActionBar().setTitle(title);
-    }
-
- */
-
 
     private void updateDetailViewVisibility() {
         boolean isTablet = Utils.isDeviceTablet(getApplicationContext());
@@ -267,103 +216,112 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-  /*  @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getOrder()) {
-            case 1: // edit
-                editRealEstate();
-                break;
-            case 2: // new
-                createNewRealEstate();
-                break;
-            case 3: // sell
-                sellRealEstate();
-                break;
-            case 4: // search
-                searchRealEstate();
-                break;
-            case 5: // map
-                showMap();
-                break;
+
+*/
+
+
+
+
+    private void configureNavigationView() {
+        binding.navView.setNavigationItemSelectedListener(this);
+
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.drawer_menu_map_button) {
+
+            Intent intent = new Intent(MainActivity.this, MapActivity.class);
+
+            startActivity(intent);
+        } else if (id == R.id.drawer_menu_simulation_button) {
+            startActivity(new Intent(this, SimulationActivity.class));
+            Log.d("setting activity ok", "setting on");
         }
-        return super.onOptionsItemSelected(item);
-    }
-
-   */
-
-    private void editRealEstate() {
-        Intent intent = new Intent(this, RealEstateEditor.class);
-        intent.putExtra("REAL_ESTATE", realEstate);
-        editRealEstateLauncher.launch(intent);
-    }
-
-    private void createNewRealEstate() {
-        Intent intent = new Intent(this, RealEstateEditor.class);
-        editRealEstateLauncher.launch(intent);
+            this.binding.mainDrawerLayout.closeDrawer(GravityCompat.START);
+            return true;
 
     }
 
-    private void sellRealEstate() {
-        Calendar cal = Calendar.getInstance();
-        DatePickerDialog datePickerDialog = new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
-            cal.set(year, month, dayOfMonth);
-            realEstate.setSaleDate(cal.getTime());
-            viewModel.createOrUpdateRealEstate(realEstate);
-        }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
-        datePickerDialog.show();
-    }
-
-    private void searchRealEstate() {
-        if (filtered) {
-            startActivity(new Intent(this, MainActivity.class));
-        } else {
-            //SearchModal searchModal = new SearchModal();
-            //searchModal.show(getSupportFragmentManager(), "searchModal");
-        }
-    }
-
-    private void showMap() {
-        if (Utils.isInternetAvailable(this)) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 10);
+        private void handleRealEstateClick (RealEstate estate){
+            this.realEstate = estate;
+            if (binding.mainFrameLayout.getVisibility() == View.VISIBLE) {
+                showDetailsFragmentInPane();
             } else {
-                Intent mapActivityIntent = new Intent(this, MapActivity.class);
-                startActivity(mapActivityIntent);
-            }
-        } else {
-            Toast.makeText(this, getString(R.string.internet_is_required), Toast.LENGTH_LONG).show();
-        }
-        Log.d("lodi", "showMap"  );
-    }
-
-
-
-    private final ActivityResultLauncher<Intent> editRealEstateLauncher =
-            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
-                    result -> {
-                        if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
-                            RealEstate editedEstate = result.getData().getParcelableExtra("EDITED_REAL_ESTATE");
-
-                            // Mettre à jour ou ajouter de nouveaux médias
-                            viewModel.addNewMedia(editedEstate, editedEstate.getID());
-
-                            // Mettre à jour l'URL du média en vedette si nécessaire
-                            // viewModel.updateEstateFeaturedMediaUrl(ancienneUrl, nouvelleUrl);
-
-                            // Mise à jour de l'objet RealEstate dans votre liste locale si nécessaire
-                            // Vous devez trouver l'objet RealEstate correspondant dans votre liste et le mettre à jour
-                            updateLocalRealEstateList(editedEstate);
-                        }
-                    });
-
-    private void updateLocalRealEstateList(RealEstate editedEstate) {
-        for (int i = 0; i < realEstateList.size(); i++) {
-            if (realEstateList.get(i).getID() == editedEstate.getID()) {
-                realEstateList.set(i, editedEstate);
-                break;
+                navigateToSupportActivity();
             }
         }
+
+        private void navigateToSupportActivity () {
+        }
+
+
+        private void showDetailsFragmentInPane () {
+            Bundle bundle = new Bundle();
+            bundle.putParcelable("REAL_ESTATE", realEstate);
+            DetailsFragment fragment = new DetailsFragment();
+            fragment.setArguments(bundle);
+            configureToolbar();
+            getSupportFragmentManager().beginTransaction()
+                    .replace(binding.mainFrameLayout.getId(), fragment)
+                    .commit();
+
+
+        }
+
+
+        private void searchRealEstate () {
+            if (filtered) {
+                startActivity(new Intent(this, MainActivity.class));
+            } else {
+                //SearchModal searchModal = new SearchModal();
+                //searchModal.show(getSupportFragmentManager(), "searchModal");
+            }
+        }
+
+        private void showMap () {
+            if (Utils.isInternetAvailable(this)) {
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 10);
+                } else {
+                    Intent mapActivityIntent = new Intent(this, MapActivity.class);
+                    startActivity(mapActivityIntent);
+                }
+            } else {
+                Toast.makeText(this, getString(R.string.internet_is_required), Toast.LENGTH_LONG).show();
+            }
+            Log.d("lodi", "showMap");
+        }
+
+
+        private final ActivityResultLauncher<Intent> editRealEstateLauncher =
+                registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                        result -> {
+                            if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                                RealEstate editedEstate = result.getData().getParcelableExtra("EDITED_REAL_ESTATE");
+
+                                // Mettre à jour ou ajouter de nouveaux médias
+                                viewModel.addNewMedia(editedEstate, editedEstate.getID());
+
+                                // Mettre à jour l'URL du média en vedette si nécessaire
+                                // viewModel.updateEstateFeaturedMediaUrl(ancienneUrl, nouvelleUrl);
+
+                                // Mise à jour de l'objet RealEstate dans votre liste locale si nécessaire
+                                // Vous devez trouver l'objet RealEstate correspondant dans votre liste et le mettre à jour
+                                updateLocalRealEstateList(editedEstate);
+                            }
+                        });
+
+        private void updateLocalRealEstateList (RealEstate editedEstate){
+            for (int i = 0; i < realEstateList.size(); i++) {
+                if (realEstateList.get(i).getID() == editedEstate.getID()) {
+                    realEstateList.set(i, editedEstate);
+                    break;
+                }
+            }
+        }
+
+
     }
 
-
-}

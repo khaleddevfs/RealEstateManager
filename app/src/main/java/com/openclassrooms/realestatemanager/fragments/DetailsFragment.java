@@ -1,6 +1,7 @@
 package com.openclassrooms.realestatemanager.fragments;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,7 +32,11 @@ public class DetailsFragment extends Fragment implements AdapterView.OnItemClick
     }
 
     public static DetailsFragment newInstance(RealEstate realEstate) {
-        return null;
+        DetailsFragment fragment = new DetailsFragment();
+        Bundle args = new Bundle();
+        args.putParcelable("REAL_ESTATE", realEstate);
+        fragment.setArguments(args);
+        return fragment;
     }
 
 
@@ -68,9 +73,13 @@ public class DetailsFragment extends Fragment implements AdapterView.OnItemClick
 
     private void loadRealEstateData() {
         Bundle bundle = getArguments();
-        assert bundle != null;
-        realEstateList = bundle.getParcelable("REAL_ESTATE");
-        updateUi();
+        if (bundle != null && bundle.containsKey("REAL_ESTATE")) {
+            realEstateList = bundle.getParcelable("REAL_ESTATE");
+            updateUi();
+        } else {
+            // Gérer la situation où les données ne sont pas disponibles
+            Log.e("DetailsFragment", "Aucune donnée RealEstate n'est disponible dans le Bundle");
+        }
     }
 
     private void updateUi() {

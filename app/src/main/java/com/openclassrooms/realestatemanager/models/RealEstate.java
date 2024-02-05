@@ -368,7 +368,7 @@ public class RealEstate implements Parcelable {
     }
 
     public void setSaleDate(Date saleDate) {
-        saleDate = saleDate;
+        this.saleDate = saleDate;
     }
 
     public String getDescription() {
@@ -376,7 +376,7 @@ public class RealEstate implements Parcelable {
     }
 
     public void setDescription(String description) {
-        description = description;
+        this.description = description;
     }
 
     public long getID() {
@@ -384,7 +384,7 @@ public class RealEstate implements Parcelable {
     }
 
     public void setID(long ID) {
-        id = ID;
+        this.id = ID;
     }
 
     public String getLocation() {
@@ -392,7 +392,7 @@ public class RealEstate implements Parcelable {
     }
 
     public void setLocation(String location) {
-        location = location;
+        this.location = location;
     }
 
     public int getSurface() {
@@ -400,7 +400,7 @@ public class RealEstate implements Parcelable {
     }
 
     public void setSurface(int surface) {
-        surface = surface;
+        this.surface = surface;
     }
 
     public int getRooms() {
@@ -408,7 +408,7 @@ public class RealEstate implements Parcelable {
     }
 
     public void setRooms(int rooms) {
-        rooms = rooms;
+        this.rooms = rooms;
     }
 
     public int getBathrooms() {
@@ -416,7 +416,7 @@ public class RealEstate implements Parcelable {
     }
 
     public void setBathrooms(int bathrooms) {
-        bathrooms = bathrooms;
+        this.bathrooms = bathrooms;
     }
 
     public int getBedrooms() {
@@ -424,7 +424,7 @@ public class RealEstate implements Parcelable {
     }
 
     public void setBedrooms(int bedrooms) {
-        bedrooms = bedrooms;
+        this.bedrooms = bedrooms;
     }
 
     public String getFeaturedMediaUrl() {
@@ -432,7 +432,7 @@ public class RealEstate implements Parcelable {
     }
 
     public void setFeaturedMediaUrl(String featuredMediaUrl) {
-        featuredMediaUrl = featuredMediaUrl;
+        this.featuredMediaUrl = featuredMediaUrl;
     }
 
     public List<RealEstateMedia> getMediaList() {
@@ -440,7 +440,7 @@ public class RealEstate implements Parcelable {
     }
 
     public void setMediaList(List<RealEstateMedia> mediaList) {
-        mediaList = mediaList;
+        this.mediaList = mediaList;
     }
 
     public String getName() {
@@ -448,7 +448,7 @@ public class RealEstate implements Parcelable {
     }
 
     public void setName(String name) {
-        name = name;
+        this.name = name;
     }
 
     public String getRegion() {
@@ -456,7 +456,7 @@ public class RealEstate implements Parcelable {
     }
 
     public void setRegion(String region) {
-        region = region;
+       this.region = region;
     }
 
     public int getPrice() {
@@ -464,7 +464,7 @@ public class RealEstate implements Parcelable {
     }
 
     public void setPrice(int priceInDollar) {
-        priceInDollar = priceInDollar;
+        this.price = priceInDollar;
     }
 
     public HashMap<String, Object> toHashMap() {

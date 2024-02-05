@@ -3,6 +3,7 @@ package com.openclassrooms.realestatemanager.adapters;
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -15,27 +16,30 @@ import com.openclassrooms.realestatemanager.databinding.RealEstateListItemBindin
 import com.openclassrooms.realestatemanager.fragments.ListFragment;
 import com.openclassrooms.realestatemanager.models.RealEstate;
 
-import java.util.function.Consumer;
 import java.util.List;
 
 public class RealEstateAdapter  extends RecyclerView.Adapter<RealEstateViewHolder> {
 
     private final List<RealEstate> realEstateList;
 
-    private final ListFragment listFragment;
-    //private final Consumer<Integer> onRealEstateClickListener;
+
 
 
     private int selectedPosition = -1;
 
     Context mContext;
 
-    public RealEstateAdapter(List<RealEstate> realEstateList, ListFragment listFragment)
+    public interface OnItemClickListener {
+        void onItemClick(RealEstate realEstate);
+    }
+
+    private OnItemClickListener listener;
+
+    public RealEstateAdapter(List<RealEstate> realEstateList, OnItemClickListener listener)
     {
         this.realEstateList = realEstateList;
+        this.listener = listener;
 
-
-        this.listFragment = listFragment;
     }
     @NonNull
     @Override
@@ -48,6 +52,9 @@ public class RealEstateAdapter  extends RecyclerView.Adapter<RealEstateViewHolde
     @Override
     public void onBindViewHolder(@NonNull RealEstateViewHolder holder, int position) {
         Log.d("TAG", "onBindViewHolder: " + realEstateList.get(position).getName());
+
+        RealEstate realEstate = realEstateList.get(position);
+
         holder.getRealEstateName().setText(realEstateList.get(position).getName());
         holder.getRealEstateRegion().setText(realEstateList.get(position).getRegion());
         holder.getRealEstatePrice().setText(mContext.getString(R.string.price,realEstateList.get(position).getPrice()));
@@ -60,10 +67,7 @@ public class RealEstateAdapter  extends RecyclerView.Adapter<RealEstateViewHolde
                 .into(holder.getRealEstateImageView());
 
         holder.itemView.setOnClickListener(v -> {
-            notifyItemChanged(selectedPosition);
-            selectedPosition = holder.getAdapterPosition();
-          //  onRealEstateClickListener.accept(holder.getAdapterPosition());
-            notifyItemChanged(selectedPosition);
+            listener.onItemClick(realEstateList.get(holder.getAdapterPosition()));
         });
     }
 

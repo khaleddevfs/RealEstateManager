@@ -1,5 +1,7 @@
 package com.openclassrooms.realestatemanager.adapters;
 
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -7,13 +9,17 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.openclassrooms.realestatemanager.databinding.RealEstateListItemBinding;
+import com.openclassrooms.realestatemanager.models.RealEstate;
 
 public class RealEstateViewHolder extends RecyclerView.ViewHolder{
-    private final RealEstateListItemBinding binding;
-    public RealEstateViewHolder(@NonNull RealEstateListItemBinding realEstateListItemBinding) {
-        super(realEstateListItemBinding.getRoot());
-       binding = realEstateListItemBinding;
-    }
+    private RealEstateListItemBinding binding;
+    public RealEstateViewHolder(RealEstateListItemBinding binding) {
+        super(binding.getRoot());
+        this.binding = binding;
+        binding.getRoot();
+
+            }
+
 
     public ImageView getRealEstateImageView()
     {
