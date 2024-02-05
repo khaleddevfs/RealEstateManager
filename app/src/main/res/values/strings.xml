@@ -5,9 +5,13 @@
     <string name="no_result">No results found</string>
 
     <string name="map">Map</string>
-
+    <string name="medias">Medias</string>
     <string name="caption">Caption</string>
     <string name="description">Description</string>
+    <string name="search">Find Your Home</string>
+    <string name="simulation">Simulation</string>
+
+    <string name="lorem">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis facilisis enim ut maximus pharetra. Aliquam erat volutpat. Fusce in erat dui. Integer sed nibh nisl. Nullam nulla augue, finibus mattis tempor a, maximus eu augue. Duis egestas urna tristique libero auctor sagittis. In hac habitasse platea dictumst. Proin porttitor commodo ipsum, vitae cursus sapien. Sed ex purus, faucibus ac maximus sed, vehicula at nunc. In at mollis mi. Proin dolor nunc, tempus id nisi in, mollis hendrerit elit. Quisque vel dolor laoreet, consectetur metus in, pellentesque justo. Maecenas consequat purus sit amet vulputate rhoncus. Vestibulum id lacus ac nibh faucibus hendrerit non ac libero. Praesent id mattis augue. Pellentesque iaculis dapibus ipsum at dignissim. Etiam porttitor, nisl a porttitor laoreet, quam leo mattis elit, faucibus consequat nisi nisi ut arcu. Aenean hendrerit tempor velit, ac lobortis massa ornare vitae. Mauris eu ligula commodo, dapibus orci et, elementum eros. In sodales iaculis mauris sed tincidunt. Mauris at dolor at ligula faucibus convallis. Nullam ac maximus nisi. Curabitur convallis sagittis augue cursus pulvinar. Nullam eleifend ultricies dui eu ullamcorper. Proin aliquam, lacus a fringilla egestas, nibh ligula luctus risus, maximus mattis dui nibh ut nisi. Morbi elit justo, condimentum quis metus et, imperdiet ultricies quam. Suspendisse porttitor ac ligula nec mattis. Donec felis justo, blandit et cursus vel, malesuada nec libero. Integer a nunc quis urna rhoncus maximus quis id sem. Curabitur molestie suscipit massa, in laoreet dolor. Vivamus in ante justo. Donec sit amet nisi dapibus, rutrum elit ac, bibendum nisi. Curabitur ut rutrum lectus. Aliquam placerat urna ut turpis molestie, quis cursus purus molestie. Mauris vestibulum finibus luctus. Sed ut sapien lectus. Nullam varius mauris dui, eget rutrum arcu blandit sit amet. Nullam ut condimentum arcu. Cras eget ipsum sem. Donec faucibus ac tellus at accumsan. Quisque convallis lacus erat. Integer tellus erat, auctor vestibulum nisi a, tincidunt molestie ante. Duis venenatis dolor id pretium vestibulum. Sed et quam a lacus vulputate bibendum at non tellus. Donec vehicula mi ac risus ultrices sagittis. Duis ullamcorper dui id neque varius elementum. Donec gravida condimentum mattis. Pellentesque hendrerit est vitae ante condimentum, et sagittis augue pellentesque. Aliquam interdum mollis laoreet. Curabitur rhoncus laoreet dui. Nullam vel egestas nunc. Nam maximus tellus vel nisl consectetur, nec porttitor purus tempus. Quisque dignissim sapien at ex varius condimentum. Vestibulum dapibus ut tortor ac tincidunt. Aliquam elit sapien, volutpat et odio vel, vehicula tincidunt velit. Aliquam eu ante mi. Nam elit mauris, varius a lorem vel, porttitor laoreet ante. Mauris pharetra viverra metus, sit amet euismod ex pharetra ut.</string>
     <string name="save">Save</string>
 
     <string name="internet_is_required">Internet is required for this feature</string>
@@ -22,11 +26,22 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
 
-
     <string name="error_insert_not_supported">Insert operation is not supported</string>
     <string name="error_delete_not_supported">Delete operation is not supported</string>
     <string name="error_update_not_supported">Update operation is not supported</string>
     <string name="error_fail_query_row_from_uri">Failed to query row for uri  %s</string>
+
+
+    <string name="agent">Agent: %s</string>
+    <string name="surface">Surface:  %d m²</string>
+    <string name="number_of_rooms">Number of rooms : %d</string>
+    <string name="number_of_bedrooms">Number of bedrooms : %d</string>
+    <string name="number_of_bathrooms">Number of bathrooms: %d</string>
+    <string name="address">Address: %s</string>
+
+
+    <string name="navigation_drawer_open">open </string>
+    <string name="navigation_drawer_close">close </string>
 
 
 </resources>

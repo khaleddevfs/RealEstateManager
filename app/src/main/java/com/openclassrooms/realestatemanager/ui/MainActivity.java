@@ -22,6 +22,7 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -34,6 +35,7 @@ import com.openclassrooms.realestatemanager.RealEstateEditor;
 import com.openclassrooms.realestatemanager.adapters.RealEstateAdapter;
 import com.openclassrooms.realestatemanager.adapters.RealEstateViewHolder;
 import com.openclassrooms.realestatemanager.fragments.DetailsFragment;
+import com.openclassrooms.realestatemanager.fragments.ListFragment;
 import com.openclassrooms.realestatemanager.injection.ViewModelFactory;
 import com.openclassrooms.realestatemanager.utils.Utils;
 import com.openclassrooms.realestatemanager.databinding.ActivityMainBinding;
@@ -64,34 +66,28 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         initView();
         initViewModel();
+        configureUI();
         processIntent(getIntent());
-        ScrollView();
+
+
+
+
+        // connecting MapsFragment with activity
+
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.main_frame_layout, new ListFragment(realEstateList))
+                .commit();
 
     }
 
-    private void ScrollView() {
-        ScrollView detailViewContainer = binding.detailViewContainer;
-        if (Utils.isDeviceTablet(getApplicationContext())) {
-            detailViewContainer.setVisibility(View.VISIBLE);
-            if(!realEstateList.isEmpty()) {
-                binding.noResultsTextView.setVisibility(View.GONE);
-                // Utilisez le premier élément de la liste comme exemple
-                handleRealEstateClick(realEstateList.get(0));
-            } else {
-                binding.noResultsTextView.setVisibility(View.VISIBLE);
-            }
-        } else {
-            detailViewContainer.setVisibility(View.GONE);
-        }
 
-        setContentView(binding.getRoot());
-        syncDatabase();
-    }
 
 
     private void initView() {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        View view = binding.getRoot();
+        setContentView(view);
     }
 
     private void initViewModel() {
@@ -99,12 +95,32 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
+    private void configureUI() {
+        this.configureToolbar();
+        this.configureDrawerLayout();
+    }
+
+
+
+    private void configureToolbar() {
+        setSupportActionBar(binding.mainToolbar);
+    }
+
+    private void configureDrawerLayout() {
+
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, binding.mainDrawerLayout, binding.mainToolbar,
+                R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        toggle.getDrawerArrowDrawable().setColor(getResources().getColor(R.color.colorWhite));
+        binding.mainDrawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
+    }
+
     private void processIntent(Intent intent) {
         if (isFilteredIntent(intent)) {
             handleFilteredEstates(intent);
-        } else {
-            observeRealEstates();
-        }
+        }  // observeRealEstates();
+
     }
 
     private boolean isFilteredIntent(Intent intent) {
@@ -115,10 +131,10 @@ public class MainActivity extends AppCompatActivity {
         realEstateList.clear();
         realEstateList.addAll(intent.getParcelableArrayListExtra("filteredEstates"));
         Log.d("TAG", "FILTERED ");
-        updateEstates();
+      //  updateEstates();
         filtered = true;
     }
-
+  /*
     private void updateEstates() {
         setRealEstateClickListener();
         updateRealEstateList();
@@ -128,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
         ConfigureDetailsFragment();
     }
 
-    private void ConfigureDetailsFragment() {
+  private void ConfigureDetailsFragment() {
         if (binding.detailViewContainer.getVisibility() == View.VISIBLE) {
             Bundle bundle = new Bundle();
             bundle.putParcelable("REAL_ESTATE", realEstate);
@@ -152,6 +168,8 @@ public class MainActivity extends AppCompatActivity {
     }
     }
 
+
+
     private void setRealEstateClickListener() {
         binding.realEstateListRv.setAdapter(new RealEstateAdapter(realEstateList, position -> {
             RealEstate selectedEstate = realEstateList.get(position);
@@ -171,8 +189,10 @@ public class MainActivity extends AppCompatActivity {
     private void navigateToSupportActivity() {
     }
 
+
+
     private void showDetailsFragment() {
-       /* Bundle bundle = new Bundle();
+       Bundle bundle = new Bundle();
         bundle.putParcelable("REAL_ESTATE", realEstate);
         DetailsFragment fragment = new DetailsFragment();
         fragment.setArguments(bundle);
@@ -181,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
                 .replace(mBinding.FragmentContainer.getId(), fragment)
                 .commit();
 
-        */
+
     }
 
 
@@ -203,13 +223,13 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(title);
     }
 
-
+ */
 
 
     private void updateDetailViewVisibility() {
         boolean isTablet = Utils.isDeviceTablet(getApplicationContext());
-        binding.detailViewContainer.setVisibility(isTablet ? View.VISIBLE : View.GONE);
-        binding.noResultsTextView.setVisibility(isTablet && realEstateList.isEmpty() ? View.VISIBLE : View.GONE);
+        binding.mainFrameLayout.setVisibility(isTablet ? View.VISIBLE : View.GONE);
+        //binding.noResultsTextView.setVisibility(isTablet && realEstateList.isEmpty() ? View.VISIBLE : View.GONE);
     }
 
     private void syncDatabase() {
@@ -217,26 +237,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void observeRealEstates() {
-        viewModel.getRealEstates().observe(this, this::getEstatesObserver);
-        filtered = false;
-        Log.d("TAG", "PAS FILTERED ");
-    }
-
-    private void getEstatesObserver(List<RealEstate> realEstates) {
-        if(shouldObserve) {
-            shouldObserve = false;
-            realEstateList.clear();
-            realEstateList.addAll(realEstates);
-
-            if (realEstateList.size() > 0)
-                updateEstates();
-
-          //  checkFirestore();
 
 
-        }
-    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -264,7 +267,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    @Override
+  /*  @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getOrder()) {
             case 1: // edit
@@ -285,6 +288,8 @@ public class MainActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+   */
 
     private void editRealEstate() {
         Intent intent = new Intent(this, RealEstateEditor.class);

@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.openclassrooms.realestatemanager.R;
 import com.openclassrooms.realestatemanager.databinding.RealEstateListItemBinding;
+import com.openclassrooms.realestatemanager.fragments.ListFragment;
 import com.openclassrooms.realestatemanager.models.RealEstate;
 
 import java.util.function.Consumer;
@@ -20,18 +21,21 @@ import java.util.List;
 public class RealEstateAdapter  extends RecyclerView.Adapter<RealEstateViewHolder> {
 
     private final List<RealEstate> realEstateList;
-    private final Consumer<Integer> onRealEstateClickListener;
+
+    private final ListFragment listFragment;
+    //private final Consumer<Integer> onRealEstateClickListener;
 
 
     private int selectedPosition = -1;
 
     Context mContext;
 
-    public RealEstateAdapter(List<RealEstate> realEstateList, Consumer<Integer> onRealEstateClickListener)
+    public RealEstateAdapter(List<RealEstate> realEstateList, ListFragment listFragment)
     {
         this.realEstateList = realEstateList;
-        this.onRealEstateClickListener = onRealEstateClickListener;
 
+
+        this.listFragment = listFragment;
     }
     @NonNull
     @Override
@@ -58,7 +62,7 @@ public class RealEstateAdapter  extends RecyclerView.Adapter<RealEstateViewHolde
         holder.itemView.setOnClickListener(v -> {
             notifyItemChanged(selectedPosition);
             selectedPosition = holder.getAdapterPosition();
-            onRealEstateClickListener.accept(holder.getAdapterPosition());
+          //  onRealEstateClickListener.accept(holder.getAdapterPosition());
             notifyItemChanged(selectedPosition);
         });
     }
