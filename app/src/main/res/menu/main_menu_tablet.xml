@@ -3,19 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
 
-    <item
-        android:id="@+id/menu_new_button"
-        android:icon="@drawable/baseline_add_24"
-        android:title="@string/new_button"
-        app:showAsAction="ifRoom"
-        android:orderInCategory="2"
-        />
-    <item
-        android:id="@+id/menu_edit_button"
-        android:icon="@drawable/baseline_edit_24"
-        android:title="@string/edit_button"
-        app:showAsAction="ifRoom"
-        android:orderInCategory="1"/>
 
 
     <item

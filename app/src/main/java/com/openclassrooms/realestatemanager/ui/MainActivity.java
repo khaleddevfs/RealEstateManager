@@ -37,6 +37,8 @@ import com.openclassrooms.realestatemanager.R;
 import com.openclassrooms.realestatemanager.RealEstateEditor;
 import com.openclassrooms.realestatemanager.adapters.RealEstateAdapter;
 import com.openclassrooms.realestatemanager.adapters.RealEstateViewHolder;
+import com.openclassrooms.realestatemanager.database.RealEstateDao;
+import com.openclassrooms.realestatemanager.database.SaveRealEstateDB;
 import com.openclassrooms.realestatemanager.fragments.DetailsFragment;
 import com.openclassrooms.realestatemanager.fragments.ListFragment;
 import com.openclassrooms.realestatemanager.injection.ViewModelFactory;
@@ -70,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         initView();
         initViewModel();
         configureUI();
+        SyncDB();
         // processIntent(getIntent());
 
 
@@ -121,6 +124,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void createNewRealEstate() {
         Intent intent = new Intent(this, RealEstateEditor.class);
         editRealEstateLauncher.launch(intent);
+        Log.d("lodi", "createNewRealEstate");
     }
 
 
@@ -190,6 +194,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
 
+*/
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuItem searchMenuItem;
@@ -217,7 +222,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
 
-*/
 
 
 
@@ -280,19 +284,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         }
 
-        private void showMap () {
-            if (Utils.isInternetAvailable(this)) {
-                if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 10);
-                } else {
-                    Intent mapActivityIntent = new Intent(this, MapActivity.class);
-                    startActivity(mapActivityIntent);
-                }
-            } else {
-                Toast.makeText(this, getString(R.string.internet_is_required), Toast.LENGTH_LONG).show();
-            }
-            Log.d("lodi", "showMap");
-        }
+
 
 
         private final ActivityResultLauncher<Intent> editRealEstateLauncher =
@@ -323,5 +315,40 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
 
+    private void SyncDB() {
+        if (Utils.isInternetAvailable(this)) {
+            SaveRealEstateDB db = SaveRealEstateDB.getInstance(this); // Remplacez par votre méthode singleton
+            RealEstateDao realEstateDao = db.realEstateDao();
+            int totalEstates = realEstateList.size();
+            int currentEstateIndex = 0;
+
+            for (RealEstate estate : realEstateList) {
+                if (!estate.getSync()) {
+                    try {
+                        // Créer ou mettre à jour le bien immobilier
+                        long result = realEstateDao.createOrUpdateRealEstate(estate);
+
+                        // Si result est > 0, la sauvegarde ou mise à jour a réussi
+                        if (result > 0) {
+                            estate.setSync(true);
+                        } else {
+                            estate.setSync(false);
+                        }
+
+                    } catch (Exception e) {
+                        estate.setSync(false);
+                    }
+
+                    currentEstateIndex++;
+                    if (currentEstateIndex == totalEstates) {
+                        shouldObserve = true;
+                    }
+                }
+            }
+        }
     }
+
+
+
+}
 

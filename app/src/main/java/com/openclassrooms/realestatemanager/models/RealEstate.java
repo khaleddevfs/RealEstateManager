@@ -7,6 +7,7 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 /*
@@ -593,6 +594,19 @@ public class RealEstate implements Parcelable {
     public void setId(long id) {
         this.id = id;
     }
+
+
+    public List<RealEstate> getFakeRealEstateData() {
+        List<RealEstate> fakeList = new ArrayList<>();
+
+        // Créez et ajoutez quelques biens immobiliers fictifs
+        fakeList.add(new RealEstate(1, "Maison de campagne", "Bretagne", "Quimper", "Belle maison en campagne", 250000, 200, 5, 2, 3, "url_media", "Agent X"));
+        fakeList.add(new RealEstate(2, "Appartement moderne", "Île-de-France", "Paris", "Appartement avec vue sur la tour Eiffel", 750000, 100, 3, 1, 2, "url_media", "Agent Y"));
+        // Ajoutez plus de biens selon vos besoins
+
+        return fakeList;
+    }
+
 
 }
 

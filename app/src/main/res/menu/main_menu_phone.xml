@@ -12,11 +12,6 @@
         android:checkable="true"
         android:orderInCategory="4"/>
 
-    <item android:id="@+id/real_estate_map"
-        android:icon="@drawable/baseline_my_location_24"
-        android:title="@string/map"
-        app:showAsAction="ifRoom"
-        android:orderInCategory="5" />
 
 
 </menu>

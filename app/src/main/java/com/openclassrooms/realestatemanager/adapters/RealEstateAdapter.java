@@ -16,6 +16,7 @@ import com.openclassrooms.realestatemanager.databinding.RealEstateListItemBindin
 import com.openclassrooms.realestatemanager.fragments.ListFragment;
 import com.openclassrooms.realestatemanager.models.RealEstate;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class RealEstateAdapter  extends RecyclerView.Adapter<RealEstateViewHolder> {
@@ -37,23 +38,21 @@ public class RealEstateAdapter  extends RecyclerView.Adapter<RealEstateViewHolde
 
     public RealEstateAdapter(List<RealEstate> realEstateList, OnItemClickListener listener)
     {
-        this.realEstateList = realEstateList;
+        this.realEstateList = realEstateList!= null ? realEstateList : new ArrayList<>();
         this.listener = listener;
 
     }
     @NonNull
     @Override
     public RealEstateViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        com.openclassrooms.realestatemanager.databinding.RealEstateListItemBinding realEstateListItemBinding = RealEstateListItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+        RealEstateListItemBinding binding = RealEstateListItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
         mContext = parent.getContext();
-        return new RealEstateViewHolder(realEstateListItemBinding);
+        return new RealEstateViewHolder(binding);
     }
 
     @Override
     public void onBindViewHolder(@NonNull RealEstateViewHolder holder, int position) {
-        Log.d("TAG", "onBindViewHolder: " + realEstateList.get(position).getName());
-
-        RealEstate realEstate = realEstateList.get(position);
+        Log.d("lodi", "onBindViewHolder: " + realEstateList.get(position).getName());
 
         holder.getRealEstateName().setText(realEstateList.get(position).getName());
         holder.getRealEstateRegion().setText(realEstateList.get(position).getRegion());
@@ -62,6 +61,7 @@ public class RealEstateAdapter  extends RecyclerView.Adapter<RealEstateViewHolde
         holder.itemView.setSelected(selectedPosition == position);
         holder.itemView.setBackground(ContextCompat.getDrawable(holder.itemView.getContext(), R.drawable.item_background_selector));
 
+        Log.d("lodi", "bind ok");
         Glide.with(mContext)
                 .load(realEstateList.get(position).getFeaturedMediaUrl())
                 .into(holder.getRealEstateImageView());
@@ -74,7 +74,7 @@ public class RealEstateAdapter  extends RecyclerView.Adapter<RealEstateViewHolde
 
     @Override
     public int getItemCount() {
-        return realEstateList.size();
+        return realEstateList != null ? realEstateList.size() : 0;
     }
 
 }

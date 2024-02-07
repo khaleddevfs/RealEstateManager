@@ -76,23 +76,23 @@ public class RealEstateMedia implements Parcelable {
 
     public RealEstateMedia(long id, long realEstateId, @NonNull String mediaUrl, @NonNull String mediaCaption,String firestoreUrl) {
         this.id = id;
-        realEstateId = realEstateId;
-        mediaUrl = mediaUrl;
-        mediaCaption = mediaCaption;
-        firestoreUrl = firestoreUrl;
+        this.realEstateId = realEstateId;
+        this.mediaUrl = mediaUrl;
+        this.mediaCaption = mediaCaption;
+        this.firestoreUrl = firestoreUrl;
     }
 
     @Ignore
     public RealEstateMedia(@NonNull String mediaUrl, @NonNull String mediaCaption) {
-        mediaUrl = mediaUrl;
-        mediaCaption = mediaCaption;
+        this.mediaUrl = mediaUrl;
+        this.mediaCaption = mediaCaption;
 
     }
     @Ignore
     public RealEstateMedia(long realEstateId, @NonNull String mediaUrl, @NonNull String mediaCaption) {
-        realEstateId = realEstateId;
-        mediaUrl = mediaUrl;
-        mediaCaption = mediaCaption;
+        this.realEstateId = realEstateId;
+        this.mediaUrl = mediaUrl;
+        this.mediaCaption = mediaCaption;
 
     }
 

@@ -2,30 +2,26 @@ package com.openclassrooms.realestatemanager;
 
 
 
-import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ContentResolver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
-import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -33,6 +29,7 @@ import androidx.core.content.ContextCompat;
 import com.google.firebase.auth.FirebaseAuth;
 import com.openclassrooms.realestatemanager.adapters.RealEstateEditorRvAdapter;
 import com.openclassrooms.realestatemanager.adapters.RealEstateEditorRvViewHolder;
+import com.openclassrooms.realestatemanager.database.SaveRealEstateDB;
 import com.openclassrooms.realestatemanager.databinding.ActivityRealEstateEditorBinding;
 import com.openclassrooms.realestatemanager.models.RealEstate;
 import com.openclassrooms.realestatemanager.models.RealEstateMedia;
@@ -360,6 +357,7 @@ public class RealEstateEditor extends AppCompatActivity {
     private RealEstate realEstate;
     private List<RealEstateMedia> mediaList = new ArrayList<>();
 
+    private SaveRealEstateDB saveRealEstateDB;
     private AlertDialog.Builder photoOrGalleryDialogBuilder;
 
     private final ActivityResultLauncher<Intent> pickImagesLauncher = registerForActivityResult(
@@ -369,6 +367,10 @@ public class RealEstateEditor extends AppCompatActivity {
             new ActivityResultContracts.StartActivityForResult(), this::handleTakePictureResult);
 
 
+
+    public RealEstateEditor() {
+        super();
+    }
 
     // Lifecycle methods...
     @Override
@@ -443,8 +445,44 @@ public class RealEstateEditor extends AppCompatActivity {
     }
 
     private void saveRealEstateData() {
-        // Save data code...
+        // Création d'une nouvelle instance de RealEstate si elle n'existe pas déjà
+        if (realEstate == null) {
+            realEstate = createRealEstate();
+        }
+
+        // Mise à jour des propriétés supplémentaires de RealEstate
+        setAdditionalRealEstateProperties(realEstate);
+
+        // Utiliser un thread séparé pour l'opération de base de données, car elle ne doit pas être exécutée sur le thread principal
+        new Thread(() -> {
+            // Obtention de l'instance de la base de données
+            SaveRealEstateDB database = SaveRealEstateDB.getInstance(getApplicationContext());
+
+            // Insertion ou mise à jour de l'immobilier dans la base de données
+            long realEstateId = database.realEstateDao().createOrUpdateRealEstate(realEstate);
+
+            // Mise à jour de l'ID de RealEstate pour tous les médias si c'est un nouvel immobilier
+            if (realEstate.getID() == 0) {
+                realEstate.setID(realEstateId);
+                for (RealEstateMedia media : mediaList) {
+                    media.setRealEstateId(realEstateId);
+                }
+            }
+
+            // Insertion ou mise à jour des médias associés à l'immobilier dans la base de données
+            for (RealEstateMedia media : mediaList) {
+                database.realEstateMediaDao().addMedia(media);
+            }
+
+            // Exécution des actions nécessaires après la sauvegarde (par exemple, retourner au précédent écran ou afficher un message)
+            runOnUiThread(() -> {
+                // Actions à exécuter sur le thread principal après la sauvegarde
+                Toast.makeText(RealEstateEditor.this, "Real Estate saved successfully", Toast.LENGTH_SHORT).show();
+                finishWithResult(realEstate);
+            });
+        }).start();
     }
+
 
     // Image handling methods...
     private void handlePickImagesResult(ActivityResult result) {
