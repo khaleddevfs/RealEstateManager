@@ -261,12 +261,15 @@ public class RealEstate implements Parcelable {
     }
 
     public void setJsonPoint(String jsonPoint) {
-        jsonPoint = jsonPoint;
+        this.jsonPoint = jsonPoint;
     }
 
 
 
     public double getLatitude() {
+        if (jsonPoint == null || jsonPoint.isEmpty()) {
+            return 0.0;
+        }
         try {
             JSONObject jsonObject = new JSONObject(jsonPoint);
             return jsonObject.optDouble("latitude", 0.0);
@@ -281,6 +284,9 @@ public class RealEstate implements Parcelable {
      * @return La longitude, ou 0.0 si jsonPoint est mal formé ou inexistant.
      */
     public double getLongitude() {
+        if (jsonPoint == null || jsonPoint.isEmpty()) {
+            return 0.0;
+        }
         try {
             JSONObject jsonObject = new JSONObject(jsonPoint);
             return jsonObject.optDouble("longitude", 0.0);
@@ -302,7 +308,7 @@ public class RealEstate implements Parcelable {
     }
 
     public void setListingDate(Date listingDate) {
-        listingDate = listingDate;
+        this.listingDate = listingDate;
     }
 
     public String getAgentName() {
@@ -310,7 +316,7 @@ public class RealEstate implements Parcelable {
     }
 
     public void setAgentName(String agentName) {
-        agentName = agentName;
+        this.agentName = agentName;
     }
 
 
@@ -556,7 +562,7 @@ public class RealEstate implements Parcelable {
 
         if(values.containsKey("name")) estate.setName(values.getAsString("name"));
 
-       // if(values.containsKey("jsonPoint")) estate.setJsonPoint(values.getAsString("jsonPoint"));
+        if(values.containsKey("jsonPoint")) estate.setJsonPoint(values.getAsString("jsonPoint"));
 
         if(values.containsKey("region")) estate.setRegion(values.getAsString("region"));
 

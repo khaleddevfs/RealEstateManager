@@ -3,6 +3,7 @@ package com.openclassrooms.realestatemanager.viewModel;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 
@@ -37,7 +38,13 @@ public class RealEstateViewModel extends ViewModel {
         return realEstateMediaRepo.getRealEstateMediaByRealEstateId(id);
     }
 
-    public void createOrUpdateRealEstate(RealEstate estate) {
+    private MutableLiveData<Boolean> saveOperationComplete = new MutableLiveData<>();
+
+    public LiveData<Boolean> isSaveOperationComplete() {
+        return saveOperationComplete;
+    }
+
+   /* public void createOrUpdateRealEstate(RealEstate estate) {
         executor.execute(() -> {
             long id = realEstateRepo.createOrUpdateRealEstate(estate);
             Log.d("TAG", "createOrUpdateRealEstate: ID: " + estate.getID() + ", New ID: " + id);
@@ -46,6 +53,37 @@ public class RealEstateViewModel extends ViewModel {
             addNewMedia(estate, id);
         });
     }
+
+    */
+
+
+    public void createOrUpdateRealEstate(RealEstate estate) {
+        executor.execute(() -> {
+            long id = realEstateRepo.createOrUpdateRealEstate(estate);
+            Log.d("RealEstateViewModel", "createOrUpdateRealEstate: ID: " + estate.getID() + ", New ID: " + id);
+
+            if (id > 0) {
+                estate.setID(id); // Mettez à jour l'ID de l'entité estate avec le nouvel ID
+                deleteAssociatedMedia(id);
+
+                if (estate.getMediaList() != null && !estate.getMediaList().isEmpty()) {
+                    for (RealEstateMedia media : estate.getMediaList()) {
+                        media.setRealEstateId(id); // Assurez-vous que l'ID de l'immobilier est correctement défini
+                        executor.execute(() -> realEstateMediaRepo.addRealEstateMedia(media));
+                    }
+                    // Notifiez ici que l'opération de sauvegarde est complète
+                    // Note: Cette notification est déclenchée de manière asynchrone
+                    saveOperationComplete.postValue(true);
+                } else {
+                    // Si il n'y a pas de médias à ajouter, notifiez immédiatement que l'opération est terminée
+                    saveOperationComplete.postValue(true);
+                }
+            } else {
+                Log.e("RealEstateViewModel", "Failed to create or update RealEstate with ID: " + estate.getID());
+                // Vous pouvez choisir de notifier un échec ici si nécessaire
+                // saveOperationComplete.postValue(false);
+            }
+        });    }
 
 
 
@@ -70,7 +108,7 @@ public class RealEstateViewModel extends ViewModel {
         return realEstateRepo.filterRealEstates(name, maxSaleDate, minListingDate, maxPrice, minPrice, maxSurface, minSurface);
     }
 
-    public void updateEstateFeaturedMediaUrl(String oldUrl, String newUrl) {
-        executor.execute(() -> realEstateRepo.updateFeaturedMediaUrl(oldUrl, newUrl));
+    public void updateEstateFeaturedMediaUrl(long realEstateId, String newUrl) {
+        executor.execute(() -> realEstateRepo.updateFeaturedMediaUrl(realEstateId, newUrl));
     }
 }

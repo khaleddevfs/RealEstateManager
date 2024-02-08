@@ -9,6 +9,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.openclassrooms.realestatemanager.R;
 import com.openclassrooms.realestatemanager.databinding.ActivitySupportBinding;
+
 import com.openclassrooms.realestatemanager.fragments.DetailsFragment;
 import com.openclassrooms.realestatemanager.models.RealEstate;
 

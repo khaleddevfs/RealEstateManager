@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // Afficher ListFragment et DetailsFragment côte à côte
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.list_fragment_container, ListFragment.newInstance(realEstateList))
+                .replace(R.id.list_fragment_container, ListFragment.newInstance())
                 .replace(R.id.details_fragment_container, new DetailsFragment())
                 .commit();
     }
@@ -113,7 +113,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // Afficher uniquement ListFragment
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.main_frame_layout, ListFragment.newInstance(realEstateList))
+                .replace(R.id.main_frame_layout, ListFragment.newInstance())
                 .commit();
     }
 

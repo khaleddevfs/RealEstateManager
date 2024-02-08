@@ -5,7 +5,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.Observer;
+
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 
@@ -23,7 +23,7 @@ import com.openclassrooms.realestatemanager.viewModel.RealEstateViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
-
+/*
 public class ListFragment extends Fragment implements RealEstateAdapter.OnItemClickListener {
 
 
@@ -105,4 +105,92 @@ public class ListFragment extends Fragment implements RealEstateAdapter.OnItemCl
         transaction.addToBackStack(null);
         transaction.commit();
     }
+}
+
+ */
+
+
+
+
+import androidx.lifecycle.ViewModelProvider;
+
+
+public class ListFragment extends Fragment implements RealEstateAdapter.OnItemClickListener {
+
+    private FragmentListBinding binding;
+    private List<RealEstate> realEstateList = new ArrayList<>();
+    private RealEstateAdapter adapter;
+    private RealEstateViewModel realEstateViewModel;
+
+    private static final String TAG = "ListFragment";
+
+
+    public ListFragment() {
+        // Required empty public constructor
+    }
+
+    public static ListFragment newInstance() {
+        return new ListFragment();
+    }
+
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Log.d(TAG, "onCreateView: Starting");
+
+        binding = FragmentListBinding.inflate(inflater, container, false);
+        initViewModel();
+        initRecyclerView();
+        return binding.getRoot();
+    }
+
+    private void initViewModel() {
+        Log.d(TAG, "initViewModel: Initializing");
+
+        realEstateViewModel = new ViewModelProvider(requireActivity()).get(RealEstateViewModel.class);
+        observeRealEstates();
+    }
+
+    private void initRecyclerView() {
+        Log.d(TAG, "initRecyclerView: Setting up RecyclerView");
+
+        adapter = new RealEstateAdapter(realEstateList, this);
+        binding.realEstateListRv.setLayoutManager(new LinearLayoutManager(getContext()));
+        binding.realEstateListRv.setAdapter(adapter);
+    }
+
+    private void observeRealEstates() {
+        Log.d(TAG, "observeRealEstates: Observing real estates");
+        realEstateViewModel.getRealEstates().observe(getViewLifecycleOwner(), realEstates -> {
+            if (realEstates != null && !realEstates.isEmpty()) {
+                Log.d(TAG, "observeRealEstates: Received " + realEstates.size() + " real estates");
+            } else {
+                Log.d(TAG, "observeRealEstates: No real estates received");
+            }
+            realEstateList.clear();
+            realEstateList.addAll(realEstates);
+            adapter.notifyDataSetChanged();
+        });
+    }
+
+    @Override
+    public void onItemClick(RealEstate realEstate) {
+        Log.d(TAG, "onItemClick: Clicked on a real estate item");
+
+        DetailsFragment detailFragment = DetailsFragment.newInstance(realEstate);
+
+        // Vérifiez si l'appareil est une tablette ou un téléphone
+        boolean isTablet = getResources().getBoolean(R.bool.isTablet);
+
+        // Choisissez le conteneur en fonction du type d'appareil
+        int containerId = isTablet ? R.id.details_fragment_container : R.id.main_frame_layout;
+
+        FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+        transaction.replace(containerId, detailFragment);
+        if (!isTablet) {
+            // Ajoutez la transaction à la pile arrière uniquement pour les téléphones
+            transaction.addToBackStack(null);
+        }
+        transaction.commit();
+    }
+
 }

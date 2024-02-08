@@ -25,7 +25,7 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
     private final RealEstateMediaRepo realEstateMediaRepo;
     private final Executor executor;
 
-    private ViewModelFactory(Context context) {
+    public ViewModelFactory(Context context) {
         SaveRealEstateDB db = SaveRealEstateDB.getInstance(context);
         realEstateRepo = new RealEstateRepo(db.realEstateDao());
         realEstateMediaRepo = new RealEstateMediaRepo(db.realEstateMediaDao());

@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ContentResolver;
+
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -25,14 +26,17 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProvider;
 
-import com.google.firebase.auth.FirebaseAuth;
+
 import com.openclassrooms.realestatemanager.adapters.RealEstateEditorRvAdapter;
 import com.openclassrooms.realestatemanager.adapters.RealEstateEditorRvViewHolder;
 import com.openclassrooms.realestatemanager.database.SaveRealEstateDB;
 import com.openclassrooms.realestatemanager.databinding.ActivityRealEstateEditorBinding;
+import com.openclassrooms.realestatemanager.injection.ViewModelFactory;
 import com.openclassrooms.realestatemanager.models.RealEstate;
 import com.openclassrooms.realestatemanager.models.RealEstateMedia;
+import com.openclassrooms.realestatemanager.viewModel.RealEstateViewModel;
 
 
 import java.io.File;
@@ -44,308 +48,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
-/*
-public class RealEstateEditor extends AppCompatActivity {
 
-    private static final int REQUEST_CODE_PICK_IMAGES = 1;
-    private static final int REQUEST_IMAGE_CAPTURE = 2;
-    private static final int REQUEST_PERMISSION_CODE = 3;
-
-    private ActivityRealEstateEditorBinding binding;
-    private RealEstate realEstate;
-    private List<RealEstateMedia> mediaList = new ArrayList<>();
-
-    private final ActivityResultLauncher<Intent> pickImagesLauncher = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(), this::handlePickImagesResult);
-
-    private final ActivityResultLauncher<Intent> takePictureLauncher = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(), this::handleTakePictureResult);
-
-    private AlertDialog.Builder photoOrGalleryDialogBuilder;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        binding = ActivityRealEstateEditorBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
-        initializeUI();
-        loadRealEstateData();
-    }
-
-
-    @Nullable
-    @Override
-    public View onCreateView(@Nullable View parent, @NonNull String name, @NonNull Context context, @NonNull AttributeSet attrs) {
-        photoOrGalleryDialogBuilder = new AlertDialog.Builder(this);
-        photoOrGalleryDialogBuilder.setTitle("Add Photo");
-        photoOrGalleryDialogBuilder.setMessage("Take a photo or choose from gallery?");
-
-        photoOrGalleryDialogBuilder.setPositiveButton("Take a photo", (dialog, which) -> takePhoto());
-
-        photoOrGalleryDialogBuilder.setNegativeButton("Choose from gallery", (dialog, which) -> pickImages());
-
-        return super.onCreateView(parent, name, context, attrs);
-    }
-
-
-    private void initializeUI() {
-        setupPhotoOrGalleryDialog();
-        binding.ivPhoto.setOnClickListener(view -> checkPermissions());
-        setupEditTextListeners();
-        binding.btSave.setOnClickListener(view -> saveRealEstateData());
-    }
-
-    private void setupPhotoOrGalleryDialog() {
-        photoOrGalleryDialogBuilder = new AlertDialog.Builder(this);
-        photoOrGalleryDialogBuilder.setTitle("Add Photo");
-        photoOrGalleryDialogBuilder.setMessage("Take a photo or choose from gallery?");
-        photoOrGalleryDialogBuilder.setPositiveButton("Take a photo", (dialog, which) -> takePhoto());
-        photoOrGalleryDialogBuilder.setNegativeButton("Choose from gallery", (dialog, which) -> pickImages());
-    }
-
-    private void setupEditTextListeners() {
-
-            View.OnFocusChangeListener listener = (view, hasFocus) -> {
-                if (!hasFocus) {
-                    // Ici, vous pouvez ajouter votre code de validation ou d'autres actions
-                    // Par exemple, vous pouvez appeler une méthode validateEditText
-                    validateEditText((EditText) view);
-                }
-            };
-
-            binding.etBathrooms.setOnFocusChangeListener(listener);
-            binding.etPrice.setOnFocusChangeListener(listener);
-            binding.etLocation.setOnFocusChangeListener(listener);
-            binding.etSurface.setOnFocusChangeListener(listener);
-            binding.etRooms.setOnFocusChangeListener(listener);
-            binding.etBedrooms.setOnFocusChangeListener(listener);
-            binding.etName.setOnFocusChangeListener(listener);
-            binding.etRegion.setOnFocusChangeListener(listener);
-        }
-
-
-        private void validateEditText(EditText editText) {
-            // Ici, vous pouvez ajouter votre logique de validation pour le EditText.
-            // Par exemple, vérifier si le champ est vide :
-            if (editText.getText().toString().trim().isEmpty()) {
-                editText.setError("Ce champ ne peut pas être vide");
-            }
-            // Vous pouvez ajouter d'autres règles de validation ici si nécessaire.
-        }
-
-
-
-    private void loadRealEstateData() {
-        realEstate = getIntent().getParcelableExtra("REAL_ESTATE");
-        if (realEstate != null) {
-            binding.etBathrooms.setText(String.format(Locale.getDefault(), "%d", realEstate.getBathrooms()));
-            binding.etBedrooms.setText(String.format(Locale.getDefault(), "%d", realEstate.getBedrooms()));
-            binding.etRooms.setText(String.format(Locale.getDefault(), "%d", realEstate.getRooms()));
-            binding.etName.setText(realEstate.getName());
-            binding.etRegion.setText(realEstate.getRegion());
-            binding.textInputEditTextDescription.setText(realEstate.getDescription());
-            mediaList = realEstate.getMediaList();
-         //   binding.rvSelectedPhotos.setAdapter(new RealEstateEditorRvAdapter(realEstateMedias));
-            binding.etSurface.setText(String.format(Locale.getDefault(), "%d", realEstate.getSurface()));
-            binding.etLocation.setText(realEstate.getLocation());
-            binding.etPrice.setText(String.format(Locale.getDefault(), "%d", realEstate.getPrice()));
-        }
-        binding.btSave.setOnClickListener(view -> btSaveClick());
-
-    }
-
-
-
-
-
-
-    private void btSaveClick() {
-        updateMediaCaptions();
-        RealEstate realEstate = createRealEstate();
-        setAdditionalRealEstateProperties(realEstate);
-        finishWithResult(realEstate);
-    }
-
-
-    private void updateMediaCaptions() {
-        for (int index = 0; index < mediaList.size(); index++) {
-            RealEstateMedia media = mediaList.get(index);
-            if (index < binding.rvSelectedPhotos.getChildCount()) {
-                String caption = ((RealEstateEditorRvViewHolder) Objects.requireNonNull(
-                        binding.rvSelectedPhotos.findViewHolderForAdapterPosition(index)))
-                        .getCaption().getText().toString();
-                media.setMediaCaption(caption);
-            }
-        }
-    }
-
-    private RealEstate createRealEstate() {
-        return null;
-        
-    }
-
-    private void setAdditionalRealEstateProperties(RealEstate realEstate) {
-        realEstate.setAgentName(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getDisplayName());
-        if (realEstate != null) {
-            realEstate.setID(realEstate.getID());
-        } else {
-            realEstate.setListingDate(new Date());
-        }
-    }
-
-    private void finishWithResult(RealEstate realEstate) {
-        Intent resultIntent = new Intent();
-        resultIntent.putExtra("EDITED_REAL_ESTATE", realEstate);
-        setResult(Activity.RESULT_OK, resultIntent);
-        finish();
-    }
-
-    private void saveRealEstateData() {
-        // Save real estate data
-    }
-// Path/filename: [appropriate file location within the Android project]
-
-    private void handlePickImagesResult(ActivityResult result) {
-        if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
-            ContentResolver contentResolver = getContentResolver();
-            ClipData clipData = result.getData().getClipData();
-            if (clipData != null) {
-                processMultipleImages(clipData, contentResolver);
-            } else if (result.getData().getData() != null) {
-                processSingleImage(result.getData().getData(), contentResolver);
-            }
-        }
-    }
-
-    private void processSingleImage(Uri uri, ContentResolver contentResolver) {
-        try {
-            String path = saveImageToInternalStorage(uri, contentResolver);
-            addMediaToCollection(path);
-        } catch (IOException e) {
-            Log.e("lodi", "Error processing single image", e);
-        }
-    }
-
-    private void processMultipleImages(ClipData clipData, ContentResolver contentResolver) {
-        for (int i = 0; i < clipData.getItemCount(); i++) {
-            Uri uri = clipData.getItemAt(i).getUri();
-            processSingleImage(uri, contentResolver);
-        }
-    }
-
-    private String saveImageToInternalStorage(Uri uri, ContentResolver contentResolver) throws IOException {
-        String name = UUID.randomUUID().toString();
-        String path = getFilesDir() + "/" + name;
-        Bitmap bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri);
-        File file = new File(getFilesDir(), name);
-
-        try (FileOutputStream fos = new FileOutputStream(file)) {
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
-            fos.flush();
-        }
-        Log.d("lodi", "file abs path: " + path);
-        return path;
-    }
-
-    private void addMediaToCollection(String path) {
-        RealEstateMedia media;
-        if (realEstate == null) {
-            media = new RealEstateMedia(path, "");
-        } else {
-            media = new RealEstateMedia(realEstate.getID(), path, "");
-        }
-        mediaList.add(media);
-    }
-
-
-    private void handleTakePictureResult(ActivityResult result) {
-        // Handle the result of the picture capture
-    }
-
-    private void takePhoto() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            takePictureLauncher.launch(takePictureIntent);
-        }
-
-    }
-
-    private void pickImages() {
-        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-        intent.setType("image/*");
-        pickImagesLauncher.launch(Intent.createChooser(intent, "Select Images"));
-
-
-    }
-
-    private void checkPermissions() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this,
-                    android.Manifest.permission.CAMERA)
-                    != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this,
-                    android.Manifest.permission.READ_EXTERNAL_STORAGE)
-                    != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this,
-                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this,
-                    android.Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this,
-                        new String[]{android.Manifest.permission.CAMERA,
-                                android.Manifest.permission.READ_EXTERNAL_STORAGE,
-                                android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                                android.Manifest.permission.READ_MEDIA_IMAGES},
-                        REQUEST_PERMISSION_CODE);
-            }
-        } else {
-            if (ContextCompat.checkSelfPermission(this,
-                    android.Manifest.permission.CAMERA)
-                    != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this,
-                    android.Manifest.permission.READ_EXTERNAL_STORAGE)
-                    != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this,
-                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this,
-                        new String[]{android.Manifest.permission.CAMERA,
-                                android.Manifest.permission.READ_EXTERNAL_STORAGE,
-                                Manifest.permission.WRITE_EXTERNAL_STORAGE
-                        },
-                        REQUEST_PERMISSION_CODE);
-
-            }
-        }
-
-    }
-
-    private void saveImageToGallery(Bitmap bitmap) {
-        // Save the bitmap image to the gallery
-    }
-
-    // Other overridden methods like onRequestPermissionsResult, onActivityResult, etc.
-
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQUEST_PERMISSION_CODE) {// If request is cancelled, the result arrays are empty.
-            if (grantResults.length > 0
-                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                photoOrGalleryDialog();
-            }
-
-        }
-    }
-
-    private void photoOrGalleryDialog() {
-        AlertDialog dialog = photoOrGalleryDialogBuilder.create();
-        dialog.show();
-    }
-}
-
- */
-
-
-// Path/filename: [appropriate file location within the Android project]
 
 public class RealEstateEditor extends AppCompatActivity {
 
@@ -353,11 +56,16 @@ public class RealEstateEditor extends AppCompatActivity {
     private static final int REQUEST_IMAGE_CAPTURE = 2;
     private static final int REQUEST_PERMISSION_CODE = 3;
 
+    private RealEstateViewModel realEstateViewModel;
+
+
+    private RealEstateEditorRvAdapter adapter;
+
     private ActivityRealEstateEditorBinding binding;
     private RealEstate realEstate;
     private List<RealEstateMedia> mediaList = new ArrayList<>();
 
-    private SaveRealEstateDB saveRealEstateDB;
+
     private AlertDialog.Builder photoOrGalleryDialogBuilder;
 
     private final ActivityResultLauncher<Intent> pickImagesLauncher = registerForActivityResult(
@@ -378,8 +86,23 @@ public class RealEstateEditor extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityRealEstateEditorBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        // Initialisation de l'adaptateur avec la liste des médias vide ou pré-chargée
+        adapter = new RealEstateEditorRvAdapter(mediaList);
+        binding.rvSelectedPhotos.setAdapter(adapter);
+
+        ViewModelFactory factory = ViewModelFactory.getInstance(getApplicationContext());
+        realEstateViewModel = new ViewModelProvider(this, factory).get(RealEstateViewModel.class);
+
         initializeUI();
         loadRealEstateData();
+
+        realEstateViewModel.isSaveOperationComplete().observe(this, isComplete -> {
+            if (isComplete) {
+                // Assurez-vous de passer l'instance de RealEstate correctement mise à jour
+                finishWithResult(); // Cette méthode doit être adaptée si elle nécessite des paramètres
+            }
+        });
     }
 
     // UI setup methods...
@@ -388,14 +111,22 @@ public class RealEstateEditor extends AppCompatActivity {
         binding.ivPhoto.setOnClickListener(view -> checkPermissions());
         setupEditTextListeners();
         binding.btSave.setOnClickListener(view -> saveRealEstateData());
+        binding.ivPhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Votre code pour ajouter un média
+                Log.d("AddMedia", "Bouton AddMedia cliqué");
+                pickImages(); // Ou une autre méthode pour ajouter des médias
+            }
+        });
     }
 
     private void setupPhotoOrGalleryDialog() {
-        photoOrGalleryDialogBuilder = new AlertDialog.Builder(this);
-        photoOrGalleryDialogBuilder.setTitle("Add Photo");
-        photoOrGalleryDialogBuilder.setMessage("Take a photo or choose from gallery?");
-        photoOrGalleryDialogBuilder.setPositiveButton("Take a photo", (dialog, which) -> takePhoto());
-        photoOrGalleryDialogBuilder.setNegativeButton("Choose from gallery", (dialog, which) -> pickImages());
+        photoOrGalleryDialogBuilder = new AlertDialog.Builder(this)
+                                     .setTitle("Add Photo")
+                                     .setMessage("Take a photo or choose from gallery?")
+                                     .setPositiveButton("Take a photo", (dialog, which) -> takePhoto())
+                                     .setNegativeButton("Choose from gallery", (dialog, which) -> pickImages());
     }
 
     private void setupEditTextListeners() {
@@ -444,22 +175,55 @@ public class RealEstateEditor extends AppCompatActivity {
         binding.btSave.setOnClickListener(view -> btSaveClick());
     }
 
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if (photoOrGalleryDialogBuilder != null) {
+            AlertDialog dialog = photoOrGalleryDialogBuilder.create();
+            if (dialog.isShowing()) {
+                dialog.dismiss();
+            }
+        }
+
+        // Log pour suivre l'appel de onDestroy
+        Log.d("RealEstateEditor", "onDestroy: Activity is being destroyed.");
+    }
+
+
     private void saveRealEstateData() {
+
+        Log.d("RealEstateEditor", "Starting saveRealEstateData");
+
         // Création d'une nouvelle instance de RealEstate si elle n'existe pas déjà
         if (realEstate == null) {
             realEstate = createRealEstate();
+            Log.d("RealEstateEditor", "Created new RealEstate instance");
+
+        }else {
+            Log.d("RealEstateEditor", "Updating existing RealEstate instance");
         }
+
+
+        // Afficher des informations détaillées sur l'instance RealEstate
+        Log.d("RealEstateEditor", "RealEstate details: Name: " + realEstate.getName() + ", Price: " + realEstate.getPrice());
 
         // Mise à jour des propriétés supplémentaires de RealEstate
         setAdditionalRealEstateProperties(realEstate);
 
         // Utiliser un thread séparé pour l'opération de base de données, car elle ne doit pas être exécutée sur le thread principal
         new Thread(() -> {
+
+            Log.d("RealEstateEditor", "Saving RealEstate in background thread");
+
             // Obtention de l'instance de la base de données
             SaveRealEstateDB database = SaveRealEstateDB.getInstance(getApplicationContext());
 
             // Insertion ou mise à jour de l'immobilier dans la base de données
             long realEstateId = database.realEstateDao().createOrUpdateRealEstate(realEstate);
+            Log.d("RealEstateEditor", "RealEstate saved with ID: " + realEstateId);
+
 
             // Mise à jour de l'ID de RealEstate pour tous les médias si c'est un nouvel immobilier
             if (realEstate.getID() == 0) {
@@ -467,18 +231,24 @@ public class RealEstateEditor extends AppCompatActivity {
                 for (RealEstateMedia media : mediaList) {
                     media.setRealEstateId(realEstateId);
                 }
+                Log.d("RealEstateEditor", "Updated RealEstate ID for associated media");
+
             }
 
             // Insertion ou mise à jour des médias associés à l'immobilier dans la base de données
             for (RealEstateMedia media : mediaList) {
                 database.realEstateMediaDao().addMedia(media);
+                Log.d("RealEstateEditor", "Saved media with path: " + media.getMediaUrl());
+
             }
 
             // Exécution des actions nécessaires après la sauvegarde (par exemple, retourner au précédent écran ou afficher un message)
             runOnUiThread(() -> {
                 // Actions à exécuter sur le thread principal après la sauvegarde
                 Toast.makeText(RealEstateEditor.this, "Real Estate saved successfully", Toast.LENGTH_SHORT).show();
-                finishWithResult(realEstate);
+                Log.d("RealEstateEditor", "Real Estate saved successfully, finishing activity");
+
+                finishWithResult();
             });
         }).start();
     }
@@ -535,6 +305,8 @@ public class RealEstateEditor extends AppCompatActivity {
             media = new RealEstateMedia(realEstate.getID(), path, "");
         }
         mediaList.add(media);
+        adapter.setRealEstateMediaList(mediaList);
+
     }
 
     private void handleTakePictureResult(ActivityResult result) {
@@ -620,6 +392,7 @@ public class RealEstateEditor extends AppCompatActivity {
         }
     }
 
+
     private void photoOrGalleryDialog() {
         AlertDialog dialog = photoOrGalleryDialogBuilder.create();
         dialog.show();
@@ -629,13 +402,16 @@ public class RealEstateEditor extends AppCompatActivity {
         updateMediaCaptions();
         RealEstate realEstate = createRealEstate();
         setAdditionalRealEstateProperties(realEstate);
-        finishWithResult(realEstate);
-    }
+        realEstateViewModel.createOrUpdateRealEstate(realEstate);    }
 
-    private void finishWithResult(RealEstate realEstate) {
-        Intent resultIntent = new Intent();
-        resultIntent.putExtra("EDITED_REAL_ESTATE", realEstate);
-        setResult(Activity.RESULT_OK, resultIntent);
+    private void finishWithResult() {
+        if (realEstate != null) {
+            Intent resultIntent = new Intent();
+            resultIntent.putExtra("EDITED_REAL_ESTATE", realEstate);
+            setResult(Activity.RESULT_OK, resultIntent);
+        } else {
+            setResult(Activity.RESULT_CANCELED);
+        }
         finish();
     }
 
@@ -670,12 +446,15 @@ public class RealEstateEditor extends AppCompatActivity {
 
     }
 
+
     private void setAdditionalRealEstateProperties(RealEstate realEstate) {
-        realEstate.setAgentName(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getDisplayName());
-        if (realEstate != null) {
-            realEstate.setID(realEstate.getID());
-        } else {
+        // Assigner un nom d'agent statique ou récupéré d'une autre source
+        realEstate.setAgentName("Agent Name"); // Nom statique pour l'exemple
+
+        // Si c'est un nouvel immobilier, définir la date de l'annonce
+        if (realEstate.getID() == 0) {
             realEstate.setListingDate(new Date());
         }
     }
+
 }

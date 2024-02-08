@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.openclassrooms.realestatemanager.databinding.MediaListItemBinding;
+import com.openclassrooms.realestatemanager.event.OnItemClickListener;
 import com.openclassrooms.realestatemanager.models.RealEstateMedia;
 
 import java.util.List;
@@ -20,9 +21,10 @@ public class MediaGalleryAdapter extends RecyclerView.Adapter<MediaGalleryViewHo
     List<RealEstateMedia> mediaList;
     private MediaListItemBinding binding;
 
-    public MediaGalleryAdapter(List<RealEstateMedia> mediaList, MediaListItemBinding binding) {
-        this.binding = binding;
-        mediaList = mediaList;
+    public MediaGalleryAdapter(List<RealEstateMedia> mediaList, OnItemClickListener onItemClickListener) {
+       // this.binding = binding;
+        this.mediaList = mediaList;
+        onItemClickListener = onItemClickListener;
     }
     @NonNull
     @Override

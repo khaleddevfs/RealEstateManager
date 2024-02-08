@@ -47,6 +47,14 @@ public interface RealEstateDao {
     LiveData<List<RealEstate>> filterRealEstates(String name, Date maxSaleDate, Date minListingDate, int maxPrice, int minPrice, int maxSurface, int minSurface);
 
     // Mettre à jour l'URL des médias en vedette pour un bien immobilier
-    @Query("UPDATE RealEstate SET featuredMediaUrl = :mediaUrl WHERE featuredMediaUrl = :oldUrl")
+  /*  @Query("UPDATE RealEstate SET featuredMediaUrl = :mediaUrl WHERE featuredMediaUrl = :oldUrl")
     void updateFeaturedMediaUrl(String oldUrl, String mediaUrl);
+
+   */
+
+
+    // Mettre à jour l'URL des médias en vedette pour un bien immobilier spécifié par son ID
+    @Query("UPDATE RealEstate SET featuredMediaUrl = :featuredMediaUrl WHERE id = :realEstateId")
+    void updateFeaturedMediaUrl(long realEstateId, String featuredMediaUrl);
+
 }

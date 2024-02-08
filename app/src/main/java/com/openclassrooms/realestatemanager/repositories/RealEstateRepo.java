@@ -42,7 +42,7 @@ public class RealEstateRepo {
     /**
      * Update the featured media URL of a real estate.
      */
-    public void updateFeaturedMediaUrl(String oldUrl, String mediaUrl) {
-        realEstateDao.updateFeaturedMediaUrl(oldUrl, mediaUrl);
+    public void updateFeaturedMediaUrl(long realEstateId, String featuredMediaUrl) {
+        realEstateDao.updateFeaturedMediaUrl(realEstateId, featuredMediaUrl);
     }
 }

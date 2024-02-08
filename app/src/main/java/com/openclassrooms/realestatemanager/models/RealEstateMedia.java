@@ -101,7 +101,7 @@ public class RealEstateMedia implements Parcelable {
     }
 
     public void setRealEstateId(long realEstateId) {
-        realEstateId = realEstateId;
+        this.realEstateId = realEstateId;
     }
 
     public long getID() {
@@ -119,7 +119,7 @@ public class RealEstateMedia implements Parcelable {
     }
 
     public void setMediaCaption(@NonNull String mediaCaption) {
-        mediaCaption = mediaCaption;
+        this.mediaCaption = mediaCaption;
     }
 
     public HashMap<String, Object> toHashMap(String agentName) {

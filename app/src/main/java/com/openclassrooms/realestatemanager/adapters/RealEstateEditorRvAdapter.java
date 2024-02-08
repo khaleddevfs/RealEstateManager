@@ -12,47 +12,53 @@ import com.bumptech.glide.Glide;
 import com.openclassrooms.realestatemanager.databinding.AddMediaListItemBinding;
 import com.openclassrooms.realestatemanager.models.RealEstateMedia;
 
+import java.io.File;
 import java.util.List;
 
 public class RealEstateEditorRvAdapter extends RecyclerView.Adapter<RealEstateEditorRvViewHolder> {
-    List<RealEstateMedia> mRealEstateMediaList;
-    private Context mContext;
+    List<RealEstateMedia> realEstateMediaList;
+    private Context context;
 
     public RealEstateEditorRvAdapter(List<RealEstateMedia> realEstateMediaList) {
-        mRealEstateMediaList = realEstateMediaList;
+        this.realEstateMediaList = realEstateMediaList;
     }
 
     @NonNull
     @Override
     public RealEstateEditorRvViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         AddMediaListItemBinding mediaListItemBinding = AddMediaListItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
-        mContext = parent.getContext();
         return new RealEstateEditorRvViewHolder(mediaListItemBinding);
     }
 
     @Override
     public void onBindViewHolder(@NonNull RealEstateEditorRvViewHolder holder, int position) {
-        Glide.with(mContext)
-                .load(mRealEstateMediaList.get(position).getMediaUrl())
-                .into(holder.getImage());
+        RealEstateMedia media = realEstateMediaList.get(position);
+        if (media != null) {
+            Glide.with(holder.itemView.getContext())
+                    .load(new File(media.getMediaUrl())) // Assurez-vous que le chemin est correct et accessible
+                    .into(holder.getImage());
+            holder.getCaption().setText(media.getMediaCaption());
 
-
-        Log.d("TAG", "onBindViewHolder: " + mRealEstateMediaList.get(position).getMediaUrl());
-
-        holder.getCaption().setText(mRealEstateMediaList.get(position).getMediaCaption());
-
-        holder.getButton().setOnClickListener(view -> {
-            if (position < mRealEstateMediaList.size()) {
-                mRealEstateMediaList.remove(position);
+            holder.getButton().setOnClickListener(view -> {
+                // Suppression de l'élément et notification de l'adaptateur
+                realEstateMediaList.remove(position);
                 notifyItemRemoved(position);
-            }
-        });
+                notifyItemRangeChanged(position, realEstateMediaList.size());
+            });
+        }
     }
 
 
 
     @Override
     public int getItemCount() {
-        return mRealEstateMediaList.size();
+        return realEstateMediaList != null ? realEstateMediaList.size() : 0;
+
+    }
+
+    public void setRealEstateMediaList(List<RealEstateMedia> realEstateMediaList) {
+        this.realEstateMediaList = realEstateMediaList;
+        notifyDataSetChanged(); // Rafraîchit la vue avec la nouvelle liste
     }
 }
+
