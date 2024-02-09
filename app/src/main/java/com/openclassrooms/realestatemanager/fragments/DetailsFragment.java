@@ -36,6 +36,9 @@ import com.openclassrooms.realestatemanager.ui.SupportActivity;
 import com.openclassrooms.realestatemanager.utils.SaveImageTask;
 import com.openclassrooms.realestatemanager.viewModel.RealEstateViewModel;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -267,8 +270,15 @@ public class DetailsFragment extends Fragment implements OnMapCreated, OnItemCli
     }
 
     private String extractLocationFromJsonPoint(String jsonPoint) {
-        // Extrait les coordonnées depuis le jsonPoint. Retournez-les dans le format "latitude,longitude".
-        return "latitude,longitude";
+        try {
+            JSONObject jsonObject = new JSONObject(jsonPoint);
+            double latitude = jsonObject.optDouble("latitude", 0.0);
+            double longitude = jsonObject.optDouble("longitude", 0.0);
+            return latitude + "," + longitude;
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return "0,0"; // Retourner une valeur par défaut en cas d'erreur
+        }
     }
 
     private String getStaticMapUrl(String location) {

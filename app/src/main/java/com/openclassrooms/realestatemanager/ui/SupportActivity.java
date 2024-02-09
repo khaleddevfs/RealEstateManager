@@ -44,13 +44,14 @@ public class SupportActivity extends AppCompatActivity {
             bundle.putParcelable("REAL_ESTATE", realEstate);
             fragment.setArguments(bundle);
 
+
             transaction.replace(binding.SupportFrame.getId(), fragment);
 
-         //   setupActionBar(realEstate);
+            setupActionBar(realEstate);
 
             transaction.commit();
         }
-/*
+
         private void setupActionBar(RealEstate realEstate) {
             int color = Color.BLUE;
             String title = realEstate.getName();
@@ -66,5 +67,5 @@ public class SupportActivity extends AppCompatActivity {
             }
         }
 
- */
+
 }

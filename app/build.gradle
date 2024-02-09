@@ -108,4 +108,7 @@ dependencies {
     implementation 'pub.devrel:easypermissions:3.0.0'
 
 
+    // Range seek bar
+    implementation 'org.florescu.android.rangeseekbar:rangeseekbar-library:0.3.0'
+
 }

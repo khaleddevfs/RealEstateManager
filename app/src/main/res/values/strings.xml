@@ -44,4 +44,13 @@
     <string name="navigation_drawer_close">close </string>
 
 
+
+    <string name="choose_the_surface_range_m">Choose the surface range (m²)</string>
+    <string name="choose_the_price_range">Choose the price range</string>
+    <string name="weeks_since_listed">Enter the number of weeks since the property was listed:</string>
+    <string name="weeks_since_sold">Enter number of weeks since sold :</string>
+    <string name="search_name_hint">Name of the estate</string>
+    <string name="estate_name_search_text_view">Name of the estate :</string>
+
+
 </resources>

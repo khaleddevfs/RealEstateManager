@@ -89,13 +89,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         // Configurer le bouton FAB pour ajouter un nouveau RealEstate
         setupFabButton();
-/*
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.main_frame_layout, ListFragment.newInstance(realEstateList))
-                .commit();
 
-        Log.d("lodi", "go to ListFragment");*/
 
     }
 
@@ -159,65 +153,33 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         binding.mainDrawerLayout.addDrawerListener(toggle);
         toggle.syncState();
     }
-/*
-    private void processIntent(Intent intent) {
-        if (isFilteredIntent(intent)) {
-            handleFilteredEstates(intent);
-        }  // observeRealEstates();
 
-    }
-
-    private boolean isFilteredIntent(Intent intent) {
-        return intent.getParcelableArrayListExtra("filteredEstates") != null;
-    }
-
-    private void handleFilteredEstates(Intent intent) {
-        realEstateList.clear();
-        realEstateList.addAll(intent.getParcelableArrayListExtra("filteredEstates"));
-        Log.d("TAG", "FILTERED ");
-      //  updateEstates();
-        filtered = true;
-    }
-
-    private void updateDetailViewVisibility() {
-        boolean isTablet = Utils.isDeviceTablet(getApplicationContext());
-        binding.mainFrameLayout.setVisibility(isTablet ? View.VISIBLE : View.GONE);
-        //binding.noResultsTextView.setVisibility(isTablet && realEstateList.isEmpty() ? View.VISIBLE : View.GONE);
-    }
-
-    private void syncDatabase() {
-        // Logic for SyncDB
-    }
-
-
-
-
-
-
-*/
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuItem searchMenuItem;
         if(Utils.isDeviceTablet(this)) {
             getMenuInflater().inflate(R.menu.main_menu_tablet, menu);
-
-        }
-        else {
+        } else {
             getMenuInflater().inflate(R.menu.main_menu_phone, menu);
-
         }
 
-        searchMenuItem = menu.findItem(R.id.menu_search_button);
+        MenuItem searchMenuItem = menu.findItem(R.id.menu_search_button);
 
-        if(filtered)
-        {
+        if(filtered) {
             searchMenuItem.setIcon(R.drawable.baseline_close_24);
-        }
-        else
+        } else {
             searchMenuItem.setIcon(R.drawable.baseline_search_24);
+        }
+
+        // Configurer l'écouteur de clic sur l'élément de menu de recherche
+        searchMenuItem.setOnMenuItemClickListener(item -> {
+            // Appeler searchRealEstate ici
+            searchRealEstate();
+            return true; // Retourner true indique que le clic sur l'élément de menu a été géré
+        });
 
         return super.onCreateOptionsMenu(menu);
     }
+
 
 
 
@@ -279,8 +241,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (filtered) {
                 startActivity(new Intent(this, MainActivity.class));
             } else {
-                //SearchModal searchModal = new SearchModal();
-                //searchModal.show(getSupportFragmentManager(), "searchModal");
+               SearchModel searchModel = new SearchModel();
+               searchModel.show(getSupportFragmentManager(), "searchModel");
             }
         }
 
