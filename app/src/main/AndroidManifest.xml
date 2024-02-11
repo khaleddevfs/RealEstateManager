@@ -41,6 +41,9 @@
             android:name=".ui.MapActivity"
             android:exported="false" />
         <activity
+            android:name=".ui.SimulationActivity"
+            android:exported="false" />
+        <activity
             android:name="com.openclassrooms.realestatemanager.RealEstateEditor"
             android:exported="false" />
         <activity

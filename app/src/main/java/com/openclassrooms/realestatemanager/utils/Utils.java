@@ -6,7 +6,9 @@ import android.net.wifi.WifiManager;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by Philippe on 21/02/2018.
@@ -48,4 +50,9 @@ public class Utils {
     public static Boolean isDeviceTablet(Context context) {
         return (context.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_LARGE;
     }
-}
+
+
+
+    }
+
+

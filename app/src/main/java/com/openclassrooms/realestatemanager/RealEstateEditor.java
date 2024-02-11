@@ -16,7 +16,10 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResult;
@@ -65,6 +68,8 @@ public class RealEstateEditor extends AppCompatActivity {
     private RealEstate realEstate;
     private List<RealEstateMedia> mediaList = new ArrayList<>();
 
+    private String selectedAgentName = ""; // Initialisez avec une valeur vide ou une valeur par défaut
+
 
     private AlertDialog.Builder photoOrGalleryDialogBuilder;
 
@@ -105,29 +110,51 @@ public class RealEstateEditor extends AppCompatActivity {
         });
     }
 
-    // UI setup methods...
     private void initializeUI() {
-        setupPhotoOrGalleryDialog();
         binding.ivPhoto.setOnClickListener(view -> checkPermissions());
         setupEditTextListeners();
         binding.btSave.setOnClickListener(view -> saveRealEstateData());
-        binding.ivPhoto.setOnClickListener(new View.OnClickListener() {
+        binding.ivPhoto.setOnClickListener(view -> {
+            // Recréer le dialogue à chaque clic
+            setupPhotoOrGalleryDialog();
+            checkPermissions();
+            // Vous n'avez pas besoin d'appeler pickImages ici directement puisque le dialogue offrira le choix
+        });
+
+
+        // Initialisation du Spinner pour choisir un agent immobilier
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.agents_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        Spinner spinnerAgent = binding.spinnerAgent;
+        spinnerAgent.setAdapter(adapter);
+        spinnerAgent.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onClick(View view) {
-                // Votre code pour ajouter un média
-                Log.d("AddMedia", "Bouton AddMedia cliqué");
-                pickImages(); // Ou une autre méthode pour ajouter des médias
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                selectedAgentName = parentView.getItemAtPosition(position).toString();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+                // Code à exécuter si rien n'est sélectionné
+                selectedAgentName = ""; // Ou gardez la dernière valeur sélectionnée selon votre logique d'application
             }
         });
+
     }
 
+
     private void setupPhotoOrGalleryDialog() {
-        photoOrGalleryDialogBuilder = new AlertDialog.Builder(this)
-                                     .setTitle("Add Photo")
-                                     .setMessage("Take a photo or choose from gallery?")
-                                     .setPositiveButton("Take a photo", (dialog, which) -> takePhoto())
-                                     .setNegativeButton("Choose from gallery", (dialog, which) -> pickImages());
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("Add Photo")
+                .setMessage("Take a photo or choose from gallery?")
+                .setPositiveButton("Take a photo", (dialogInterface, which) -> takePhoto())
+                .setNegativeButton("Choose from gallery", (dialogInterface, which) -> pickImages())
+                .create(); // Créer l'instance de dialogue ici
+
+        dialog.show(); // Afficher le dialogue directement
     }
+
 
     private void setupEditTextListeners() {
         View.OnFocusChangeListener listener = (view, hasFocus) -> {
@@ -148,6 +175,8 @@ public class RealEstateEditor extends AppCompatActivity {
         binding.etBedrooms.setOnFocusChangeListener(listener);
         binding.etName.setOnFocusChangeListener(listener);
         binding.etRegion.setOnFocusChangeListener(listener);
+
+
     }
 
     private void validateEditText(EditText editText) {
@@ -441,6 +470,9 @@ public class RealEstateEditor extends AppCompatActivity {
         realEstate.setBedrooms(Integer.parseInt(binding.etBedrooms.getText().toString()));
         realEstate.setBathrooms(Integer.parseInt(binding.etBathrooms.getText().toString()));
         realEstate.setMediaList(mediaList);
+        realEstate.setAgentName(selectedAgentName);
+
+
 
         return realEstate;
 
@@ -449,7 +481,7 @@ public class RealEstateEditor extends AppCompatActivity {
 
     private void setAdditionalRealEstateProperties(RealEstate realEstate) {
         // Assigner un nom d'agent statique ou récupéré d'une autre source
-        realEstate.setAgentName("Agent Name"); // Nom statique pour l'exemple
+       // realEstate.setAgentName("Agent Name"); // Nom statique pour l'exemple
 
         // Si c'est un nouvel immobilier, définir la date de l'annonce
         if (realEstate.getID() == 0) {

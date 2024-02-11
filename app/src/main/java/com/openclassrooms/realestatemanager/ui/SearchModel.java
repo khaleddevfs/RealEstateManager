@@ -34,6 +34,8 @@ import java.util.Date;
 import java.util.List;
 public class SearchModel extends DialogFragment {
 
+
+
     private RangeSeekBar<Integer> surfaceSeekBar, priceSeekBar;
     private EditText listedWeeksEditText, soldWeeksEditText, estateNameSearchEditText;
 
@@ -95,13 +97,24 @@ public class SearchModel extends DialogFragment {
 
     private RangeSeekBar<Integer> addRangeSeekBar(ViewGroup parent, int minValue, int maxValue, int labelTextResId) {
         addTextView(parent, labelTextResId);
+        final TextView minTextView = addValueTextView(parent, "Min: " + minValue); // Pour la valeur min
+        final TextView maxTextView = addValueTextView(parent, "Max: " + maxValue); // Pour la valeur max
         RangeSeekBar<Integer> rangeSeekBar = new RangeSeekBar<>(requireActivity());
         rangeSeekBar.setRangeValues(minValue, maxValue);
         rangeSeekBar.setSelectedMinValue(minValue);
         rangeSeekBar.setSelectedMaxValue(maxValue);
+        // Mettre à jour les TextViews lors du changement des valeurs
+        rangeSeekBar.setOnRangeSeekBarChangeListener(new RangeSeekBar.OnRangeSeekBarChangeListener<Integer>() {
+            @Override
+            public void onRangeSeekBarValuesChanged(RangeSeekBar<?> bar, Integer minValue, Integer maxValue) {
+                minTextView.setText("Min: " + minValue); // Met à jour la valeur min
+                maxTextView.setText("Max: " + maxValue); // Met à jour la valeur max
+            }
+        });
         parent.addView(rangeSeekBar);
         return rangeSeekBar;
     }
+
 
     private void addButton(ViewGroup parent, int textResId) {
         Button button = new Button(getActivity());
@@ -149,5 +162,13 @@ public class SearchModel extends DialogFragment {
     private ArrayList<Parcelable> toParcelableList(List<RealEstate> realEstates) {
         return new ArrayList<>(realEstates);
     }
+
+    private TextView addValueTextView(ViewGroup parent, String text) {
+        TextView textView = new TextView(getActivity());
+        textView.setText(text);
+        parent.addView(textView);
+        return textView;
+    }
+
 }
 

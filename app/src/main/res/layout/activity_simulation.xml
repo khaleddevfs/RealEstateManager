@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/etLoanAmount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/amount"
+        android:inputType="numberDecimal"/>
+
+    <EditText
+        android:id="@+id/etInterestRate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/rate"
+        android:inputType="numberDecimal"/>
+
+    <EditText
+        android:id="@+id/etLoanPeriod"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/period"
+        android:inputType="number"/>
+
+    <Button
+        android:id="@+id/btnCalculate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/calculate"/>
+
+    <TextView
+        android:id="@+id/tvMonthlyPayment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:layout_marginTop="16dp"
+        android:text="@string/monthly_payment"/>
+
+</LinearLayout>

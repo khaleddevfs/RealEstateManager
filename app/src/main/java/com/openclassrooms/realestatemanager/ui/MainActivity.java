@@ -181,13 +181,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
 
-
-
-
-
-
-
-
     private void configureNavigationView() {
         binding.navView.setNavigationItemSelectedListener(this);
 
@@ -202,8 +195,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             startActivity(intent);
         } else if (id == R.id.drawer_menu_simulation_button) {
-            startActivity(new Intent(this, SimulationActivity.class));
+            Intent intentS = new Intent(MainActivity.this, SimulationActivity.class);
             Log.d("setting activity ok", "setting on");
+            startActivity(intentS);
         }
             this.binding.mainDrawerLayout.closeDrawer(GravityCompat.START);
             return true;
@@ -232,8 +226,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             getSupportFragmentManager().beginTransaction()
                     .replace(binding.mainFrameLayout.getId(), fragment)
                     .commit();
-
-
         }
 
 

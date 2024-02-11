@@ -50,7 +50,25 @@
     <string name="weeks_since_listed">Enter the number of weeks since the property was listed:</string>
     <string name="weeks_since_sold">Enter number of weeks since sold :</string>
     <string name="search_name_hint">Name of the estate</string>
-    <string name="estate_name_search_text_view">Name of the estate :</string>
+    <string name="estate_name_search_text_view">Name of the estate :</string>   monthly_payment
+
+    //simulation activity
+
+    <string name="amount">Loan Amount</string>
+    <string name="rate">Interest Rate (%)</string>
+    <string name="period">Loan Period (Years)</string>
+    <string name="calculate">Calculate</string>
+    <string name="monthly_payment">monthly_payment</string>
+
+
+
+    <string-array name="agents_array">
+        <item>Chris</item>
+        <item>Jimmey</item>
+        <item>Anne Lise</item>
+        <!-- Ajoutez d'autres agents ici -->
+    </string-array>
+
 
 
 </resources>
