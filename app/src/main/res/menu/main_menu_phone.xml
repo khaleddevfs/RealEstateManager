@@ -10,8 +10,16 @@
         android:title="@string/search_button"
         app:showAsAction="ifRoom"
         android:checkable="true"
+        android:orderInCategory="3"/>
+
+
+
+    <item
+        android:id="@+id/menu_add_button"
+        android:icon="@drawable/baseline_add_24"
+        android:title="@string/add"
+        app:showAsAction="ifRoom"
+        android:checkable="true"
         android:orderInCategory="4"/>
-
-
 
 </menu>

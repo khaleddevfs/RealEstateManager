@@ -1,12 +1,12 @@
-package com.openclassrooms.realestatemanager;
+/*
+package com.openclassrooms.realestatemanager.fragments;
 
-
+import static com.firebase.ui.auth.AuthUI.getApplicationContext;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ContentResolver;
-
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -15,7 +15,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -26,21 +28,21 @@ import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-
+import com.openclassrooms.realestatemanager.R;
 import com.openclassrooms.realestatemanager.adapters.RealEstateEditorRvAdapter;
 import com.openclassrooms.realestatemanager.adapters.RealEstateEditorRvViewHolder;
 import com.openclassrooms.realestatemanager.database.SaveRealEstateDB;
-import com.openclassrooms.realestatemanager.databinding.ActivityRealEstateEditorBinding;
+import com.openclassrooms.realestatemanager.databinding.FragmentRealEstateEditorBinding;
 import com.openclassrooms.realestatemanager.injection.ViewModelFactory;
 import com.openclassrooms.realestatemanager.models.RealEstate;
 import com.openclassrooms.realestatemanager.models.RealEstateMedia;
 import com.openclassrooms.realestatemanager.viewModel.RealEstateViewModel;
-
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -52,25 +54,14 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
 
-
-public class RealEstateEditor extends AppCompatActivity {
-
-    private static final int REQUEST_CODE_PICK_IMAGES = 1;
-    private static final int REQUEST_IMAGE_CAPTURE = 2;
-    private static final int REQUEST_PERMISSION_CODE = 3;
+public class RealEstateEditorFragment extends Fragment {
 
     private RealEstateViewModel realEstateViewModel;
-
-
     private RealEstateEditorRvAdapter adapter;
-
-    private ActivityRealEstateEditorBinding binding;
+    private FragmentRealEstateEditorBinding binding;
     private RealEstate realEstate;
     private List<RealEstateMedia> mediaList = new ArrayList<>();
-
     private String selectedAgentName = ""; // Initialisez avec une valeur vide ou une valeur par défaut
-
-
     private AlertDialog.Builder photoOrGalleryDialogBuilder;
 
     private final ActivityResultLauncher<Intent> pickImagesLauncher = registerForActivityResult(
@@ -79,32 +70,23 @@ public class RealEstateEditor extends AppCompatActivity {
     private final ActivityResultLauncher<Intent> takePictureLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(), this::handleTakePictureResult);
 
-
-
-    public RealEstateEditor() {
-        super();
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        binding = FragmentRealEstateEditorBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
-    // Lifecycle methods...
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        binding = ActivityRealEstateEditorBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
-
-        // Initialisation de l'adaptateur avec la liste des médias vide ou pré-chargée
-        adapter = new RealEstateEditorRvAdapter(mediaList);
-        binding.rvSelectedPhotos.setAdapter(adapter);
-
-        ViewModelFactory factory = ViewModelFactory.getInstance(getApplicationContext());
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        ViewModelFactory factory = ViewModelFactory.getInstance(requireActivity().getApplicationContext());
         realEstateViewModel = new ViewModelProvider(this, factory).get(RealEstateViewModel.class);
-
         initializeUI();
         loadRealEstateData();
 
-        realEstateViewModel.isSaveOperationComplete().observe(this, isComplete -> {
+        realEstateViewModel.isSaveOperationComplete().observe(getViewLifecycleOwner(), isComplete -> {
             if (isComplete) {
-                // Assurez-vous de passer l'instance de RealEstate correctement mise à jour
                 finishWithResult(); // Cette méthode doit être adaptée si elle nécessite des paramètres
             }
         });
@@ -206,7 +188,7 @@ public class RealEstateEditor extends AppCompatActivity {
 
 
     @Override
-    protected void onDestroy() {
+    public void onDestroy() {
         super.onDestroy();
 
         if (photoOrGalleryDialogBuilder != null) {
@@ -225,7 +207,6 @@ public class RealEstateEditor extends AppCompatActivity {
 
         Log.d("RealEstateEditor", "Starting saveRealEstateData");
 
-        // Création d'une nouvelle instance de RealEstate si elle n'existe pas déjà
         if (realEstate == null) {
             realEstate = createRealEstate();
             Log.d("RealEstateEditor", "Created new RealEstate instance");
@@ -235,26 +216,20 @@ public class RealEstateEditor extends AppCompatActivity {
         }
 
 
-        // Afficher des informations détaillées sur l'instance RealEstate
         Log.d("RealEstateEditor", "RealEstate details: Name: " + realEstate.getName() + ", Price: " + realEstate.getPrice());
 
-        // Mise à jour des propriétés supplémentaires de RealEstate
         setAdditionalRealEstateProperties(realEstate);
 
-        // Utiliser un thread séparé pour l'opération de base de données, car elle ne doit pas être exécutée sur le thread principal
         new Thread(() -> {
 
             Log.d("RealEstateEditor", "Saving RealEstate in background thread");
 
-            // Obtention de l'instance de la base de données
             SaveRealEstateDB database = SaveRealEstateDB.getInstance(getApplicationContext());
 
-            // Insertion ou mise à jour de l'immobilier dans la base de données
             long realEstateId = database.realEstateDao().createOrUpdateRealEstate(realEstate);
             Log.d("RealEstateEditor", "RealEstate saved with ID: " + realEstateId);
 
 
-            // Mise à jour de l'ID de RealEstate pour tous les médias si c'est un nouvel immobilier
             if (realEstate.getID() == 0) {
                 realEstate.setID(realEstateId);
                 for (RealEstateMedia media : mediaList) {
@@ -264,16 +239,13 @@ public class RealEstateEditor extends AppCompatActivity {
 
             }
 
-            // Insertion ou mise à jour des médias associés à l'immobilier dans la base de données
             for (RealEstateMedia media : mediaList) {
                 database.realEstateMediaDao().addMedia(media);
                 Log.d("RealEstateEditor", "Saved media with path: " + media.getMediaUrl());
 
             }
 
-            // Exécution des actions nécessaires après la sauvegarde (par exemple, retourner au précédent écran ou afficher un message)
             runOnUiThread(() -> {
-                // Actions à exécuter sur le thread principal après la sauvegarde
                 Toast.makeText(RealEstateEditor.this, "Real Estate saved successfully", Toast.LENGTH_SHORT).show();
                 Log.d("RealEstateEditor", "Real Estate saved successfully, finishing activity");
 
@@ -431,17 +403,7 @@ public class RealEstateEditor extends AppCompatActivity {
         updateMediaCaptions();
         RealEstate realEstate = createRealEstate();
         setAdditionalRealEstateProperties(realEstate);
-        realEstateViewModel.createOrUpdateRealEstate(realEstate);    }
-
-    private void finishWithResult() {
-        if (realEstate != null) {
-            Intent resultIntent = new Intent();
-            resultIntent.putExtra("EDITED_REAL_ESTATE", realEstate);
-            setResult(Activity.RESULT_OK, resultIntent);
-        } else {
-            setResult(Activity.RESULT_CANCELED);
-        }
-        finish();
+        realEstateViewModel.createOrUpdateRealEstate(realEstate);
     }
 
 
@@ -481,7 +443,7 @@ public class RealEstateEditor extends AppCompatActivity {
 
     private void setAdditionalRealEstateProperties(RealEstate realEstate) {
         // Assigner un nom d'agent statique ou récupéré d'une autre source
-       // realEstate.setAgentName("Agent Name"); // Nom statique pour l'exemple
+        // realEstate.setAgentName("Agent Name"); // Nom statique pour l'exemple
 
         // Si c'est un nouvel immobilier, définir la date de l'annonce
         if (realEstate.getID() == 0) {
@@ -489,5 +451,16 @@ public class RealEstateEditor extends AppCompatActivity {
         }
     }
 
+
+    private void finishWithResult() {
+        // Vous devrez peut-être adapter cette méthode pour mieux s'intégrer à la navigation dans votre application.
+        if (realEstate != null) {
+            // Gérer le résultat. Par exemple, utiliser un ViewModel partagé ou une interface de callback pour communiquer avec l'Activity ou d'autres Fragments.
+        }
+    }
+
+    // N'oubliez pas d'adapter les autres méthodes pour le Fragment.
+    // Par exemple, pour les permissions, utilisez ContextCompat.checkSelfPermission dans getContext(), et pour les Toasts, utilisez requireActivity() comme context.
 }
 
+ */

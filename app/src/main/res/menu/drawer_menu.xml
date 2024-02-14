@@ -9,4 +9,9 @@
         android:icon="@drawable/baseline_attach_money_24"
         android:title="@string/simulation"/>
 
+    <item
+        android:id="@+id/drawer_menu_news_button"
+        android:icon="@drawable/baseline_news_24"
+        android:title="@string/news" />
+
 </menu>

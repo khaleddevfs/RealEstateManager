@@ -22,7 +22,7 @@ public class RealEstateContentProvider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
-        return false;
+        return true;
     }
 
     @Nullable

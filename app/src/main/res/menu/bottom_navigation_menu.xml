@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/bottom_navigation_menu_home_button"
+        android:icon="@drawable/baseline_home_24"
+        android:title="@string/home" />
+    <item
+        android:id="@+id/bottom_navigation_menu_map_button"
+        android:icon="@drawable/ic_baseline_map_24"
+        android:title="@string/map" />
+    <item
+        android:id="@+id/bottom_navigation_menu_add_button"
+        android:icon="@drawable/baseline_add_24"
+        android:title="@string/add" />
+    <item
+        android:id="@+id/bottom_navigation_menu_simulation_button"
+        android:icon="@drawable/baseline_attach_money_24"
+        android:title="@string/simulation" />
+    <item
+        android:id="@+id/bottom_navigation_menu_news_button"
+        android:icon="@drawable/baseline_news_24"
+        android:title="@string/news" />
+</menu>

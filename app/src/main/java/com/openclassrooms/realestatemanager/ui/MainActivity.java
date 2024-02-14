@@ -27,6 +27,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -41,6 +42,7 @@ import com.openclassrooms.realestatemanager.database.RealEstateDao;
 import com.openclassrooms.realestatemanager.database.SaveRealEstateDB;
 import com.openclassrooms.realestatemanager.fragments.DetailsFragment;
 import com.openclassrooms.realestatemanager.fragments.ListFragment;
+import com.openclassrooms.realestatemanager.fragments.MapFragment;
 import com.openclassrooms.realestatemanager.injection.ViewModelFactory;
 import com.openclassrooms.realestatemanager.utils.Utils;
 import com.openclassrooms.realestatemanager.databinding.ActivityMainBinding;
@@ -177,9 +179,61 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             return true; // Retourner true indique que le clic sur l'élément de menu a été géré
         });
 
+
+        // Ajouter un écouteur pour menu_add_button
+        MenuItem addMenuItem = menu.findItem(R.id.menu_add_button);
+        addMenuItem.setOnMenuItemClickListener(item -> {
+            // Naviguer vers createRealEstate ici
+              createNewRealEstate();
+            return true; // Indique que le clic sur l'élément de menu a été géré
+        });
+
         return super.onCreateOptionsMenu(menu);
     }
 
+/*
+    //----- Bottom Navigation -----
+
+    private void configureBottomView() {
+        if (binding.mainBottomNavigationView != null) {
+            binding.mainBottomNavigationView.setOnNavigationItemReselectedListener(item -> onBottomNavigation(item.getItemId()));
+        } else {
+            Log.e("MainActivity", "BottomNavigationView is null. Unable to set OnNavigationItemReselectedListener.");
+        }
+    }
+
+
+
+
+
+
+    public void onBottomNavigation(int itemId) {
+
+        Log.d("BottomNavigation", "onBottomNavigation called, itemId: " + itemId);
+
+        Fragment selectedFragment = null;
+
+        if (itemId == R.id.bottom_navigation_menu_home_button) {
+            selectedFragment = new ListFragment();
+        } else if (itemId == R.id.bottom_navigation_menu_map_button) {
+            selectedFragment = new MapFragment();
+        } else if (itemId == R.id.bottom_navigation_menu_add_button) {
+           // selectedFragment = new WorkmatesFragment();
+        }
+
+        if (selectedFragment != null) {
+
+            Log.d("BottomNavigation", "Replacing fragment with: " + selectedFragment.getClass().getSimpleName());
+
+            MainActivity.this
+                    .getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.main_frame_layout, selectedFragment)
+                    .commit();
+        }
+    }
+
+ */
 
     private void configureNavigationView() {
         binding.navView.setNavigationItemSelectedListener(this);
@@ -189,20 +243,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
+
         if (id == R.id.drawer_menu_map_button) {
-
+            // Lancement de MapActivity
             Intent intent = new Intent(MainActivity.this, MapActivity.class);
-
             startActivity(intent);
         } else if (id == R.id.drawer_menu_simulation_button) {
+            // Lancement de SimulationActivity
             Intent intentS = new Intent(MainActivity.this, SimulationActivity.class);
-            Log.d("setting activity ok", "setting on");
+            Log.d("Simulation activity ok", "Simulation on");
             startActivity(intentS);
+        } else if (id == R.id.drawer_menu_news_button) {
+            // Lancement de NewsActivity
+            Intent intentN = new Intent(MainActivity.this, NewsActivity.class);
+            startActivity(intentN);
         }
-            this.binding.mainDrawerLayout.closeDrawer(GravityCompat.START);
-            return true;
 
+        this.binding.mainDrawerLayout.closeDrawer(GravityCompat.START);
+        return true;
     }
+
+
+
 
         private void handleRealEstateClick (RealEstate estate){
             this.realEstate = estate;

@@ -2,6 +2,31 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
+      <entry key="RealEstateDaoTest">
+        <State>
+          <targetSelectedWithDropDown>
+            <Target>
+              <type value="QUICK_BOOT_TARGET" />
+              <deviceKey>
+                <Key>
+                  <type value="VIRTUAL_DEVICE_PATH" />
+                  <value value="C:\Users\khale\.android\avd\Pixel_Tablet_API_30.avd" />
+                </Key>
+              </deviceKey>
+            </Target>
+          </targetSelectedWithDropDown>
+          <timeTargetWasSelectedWithDropDown value="2024-02-13T22:22:56.902965200Z" />
+        </State>
+      </entry>
+      <entry key="RealEstateMediaDaoTest">
+        <State />
+      </entry>
+      <entry key="RealEstateTest">
+        <State />
+      </entry>
+      <entry key="UtilsInstrumentedTest">
+        <State />
+      </entry>
       <entry key="app">
         <State>
           <targetSelectedWithDropDown>
@@ -17,6 +42,9 @@
           </targetSelectedWithDropDown>
           <timeTargetWasSelectedWithDropDown value="2024-02-11T11:29:43.523478100Z" />
         </State>
+      </entry>
+      <entry key="internet_should_be_available()">
+        <State />
       </entry>
     </value>
   </component>

@@ -502,7 +502,8 @@ public class RealEstate implements Parcelable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         RealEstate estate = (RealEstate) o;
-        return getName().equals(estate.getName());
+        return Objects.equals(getName(), estate.getName());
+
     }
 
     @Override

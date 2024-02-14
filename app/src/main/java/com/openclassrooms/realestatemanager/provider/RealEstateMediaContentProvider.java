@@ -20,7 +20,7 @@ public class RealEstateMediaContentProvider extends ContentProvider {
     public static final String TABLE_NAME = RealEstateMedia.class.getSimpleName();
     @Override
     public boolean onCreate() {
-        return false;
+        return true;
     }
 
     @Nullable

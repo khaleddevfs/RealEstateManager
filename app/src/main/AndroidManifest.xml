@@ -1,17 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.openclassrooms.realestatemanager">
-
     <!-- Permissions -->
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
-    <uses-feature android:name="android.hardware.camera" android:required="false" />
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
 
     <application
         android:allowBackup="true"
@@ -24,18 +31,15 @@
         <!-- Google Maps API Key -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyCpWVbw3qFliTTITDAo1XobSgXcPhccry4" />
-
-        <!-- Content Providers -->
+            android:value="AIzaSyCpWVbw3qFliTTITDAo1XobSgXcPhccry4" /> <!-- Content Providers -->
         <provider
             android:name=".provider.RealEstateContentProvider"
-            android:authorities="com.openclassrooms.realestatemanager.provider"
+            android:authorities="com.openclassrooms.realestatemanager.provider.RealEstateContentProvider"
             android:exported="true" />
         <provider
             android:name=".provider.RealEstateMediaContentProvider"
-            android:authorities="com.openclassrooms.realestatemanager.provider"
+            android:authorities="com.openclassrooms.realestatemanager.provider.RealEstateMediaContentProvider"
             android:exported="true" />
-
         <!-- Activities -->
         <activity
             android:name=".ui.MapActivity"
@@ -44,7 +48,10 @@
             android:name=".ui.SimulationActivity"
             android:exported="false" />
         <activity
-            android:name="com.openclassrooms.realestatemanager.RealEstateEditor"
+            android:name=".ui.NewsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".RealEstateEditor"
             android:exported="false" />
         <activity
             android:name=".ui.SupportActivity"
@@ -54,8 +61,10 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
     </application>
+
 </manifest>
