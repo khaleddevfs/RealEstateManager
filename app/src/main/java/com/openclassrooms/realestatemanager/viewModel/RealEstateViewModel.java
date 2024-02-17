@@ -111,4 +111,21 @@ public class RealEstateViewModel extends ViewModel {
     public void updateEstateFeaturedMediaUrl(long realEstateId, String newUrl) {
         executor.execute(() -> realEstateRepo.updateFeaturedMediaUrl(realEstateId, newUrl));
     }
+
+    public void deleteRealEstate(RealEstate estate) {
+        executor.execute(() -> {
+            // Commencez par supprimer tous les médias associés à l'immobilier
+            realEstateMediaRepo.deleteAllMediaByRealEstateID(estate.getID());
+
+            // Ensuite, supprimez l'immobilier lui-même
+            realEstateRepo.deleteRealEstate(estate);
+
+            Log.d("RealEstateViewModel", "deleteRealEstate: Deleted RealEstate with ID: " + estate.getID());
+
+            // Ici, vous pouvez utiliser LiveData pour notifier l'UI que la suppression est terminée
+            // Par exemple, en mettant à jour une MutableLiveData<Boolean> similaire à `saveOperationComplete`
+            // Cette étape est optionnelle et dépend de la manière dont vous souhaitez gérer les retours dans l'UI
+        });
+    }
+
 }

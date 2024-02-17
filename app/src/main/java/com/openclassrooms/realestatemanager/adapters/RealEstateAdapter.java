@@ -13,15 +13,17 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.openclassrooms.realestatemanager.R;
 import com.openclassrooms.realestatemanager.databinding.RealEstateListItemBinding;
+import com.openclassrooms.realestatemanager.event.OnRealEstateClickListener;
 import com.openclassrooms.realestatemanager.fragments.ListFragment;
 import com.openclassrooms.realestatemanager.models.RealEstate;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class RealEstateAdapter  extends RecyclerView.Adapter<RealEstateViewHolder> {
+public class RealEstateAdapter extends RecyclerView.Adapter<RealEstateViewHolder> {
 
     private final List<RealEstate> realEstateList;
+
 
 
 
@@ -32,6 +34,7 @@ public class RealEstateAdapter  extends RecyclerView.Adapter<RealEstateViewHolde
 
     public interface OnItemClickListener {
         void onItemClick(RealEstate realEstate);
+        void onDeleteClick(RealEstate realEstate);
     }
 
     private OnItemClickListener listener;
@@ -58,8 +61,12 @@ public class RealEstateAdapter  extends RecyclerView.Adapter<RealEstateViewHolde
         holder.getRealEstateRegion().setText(realEstateList.get(position).getRegion());
         holder.getRealEstatePrice().setText(mContext.getString(R.string.price,realEstateList.get(position).getPrice()));
 
+        holder.getDeleteButton().setOnClickListener(v -> listener.onDeleteClick(realEstateList.get(holder.getAdapterPosition())));
+
+
         holder.itemView.setSelected(selectedPosition == position);
         holder.itemView.setBackground(ContextCompat.getDrawable(holder.itemView.getContext(), R.drawable.item_background_selector));
+
 
         Log.d("lodi", "bind ok");
         Glide.with(mContext)
@@ -69,6 +76,9 @@ public class RealEstateAdapter  extends RecyclerView.Adapter<RealEstateViewHolde
         holder.itemView.setOnClickListener(v -> {
             listener.onItemClick(realEstateList.get(holder.getAdapterPosition()));
         });
+
+
+
     }
 
 

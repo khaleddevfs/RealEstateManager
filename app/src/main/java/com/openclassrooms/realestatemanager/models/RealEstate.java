@@ -139,6 +139,9 @@ import java.util.Objects;
 @Entity
 public class RealEstate implements Parcelable {
 
+    private transient double latitude = Double.MIN_VALUE; // Utiliser transient pour exclure de Room
+    private transient double longitude = Double.MIN_VALUE;
+
     @ColumnInfo(name = "listing_date")
     Date listingDate;
     @ColumnInfo(name = "sale_date")
@@ -262,38 +265,42 @@ public class RealEstate implements Parcelable {
 
     public void setJsonPoint(String jsonPoint) {
         this.jsonPoint = jsonPoint;
+        parseJsonPoint();
+    }
+    // Méthode privée pour analyser jsonPoint et stocker latitude et longitude
+    private void parseJsonPoint() {
+        if (jsonPoint == null || jsonPoint.isEmpty()) {
+            latitude = 0.0;
+            longitude = 0.0;
+            return;
+        }
+        try {
+            JSONObject jsonObject = new JSONObject(jsonPoint);
+            latitude = jsonObject.optDouble("latitude", 0.0);
+            longitude = jsonObject.optDouble("longitude", 0.0);
+        } catch (JSONException e) {
+            Log.e("RealEstate", "Erreur lors de l'analyse de jsonPoint", e);
+            latitude = 0.0; // Assigner une valeur par défaut en cas d'erreur
+            longitude = 0.0;
+        }
     }
 
 
 
+
+    // Utiliser les valeurs stockées pour la latitude et la longitude
     public double getLatitude() {
-        if (jsonPoint == null || jsonPoint.isEmpty()) {
-            return 0.0;
+        if (latitude == Double.MIN_VALUE) {
+            parseJsonPoint(); // Assurer une analyse en cas d'accès direct sans passer par setJsonPoint
         }
-        try {
-            JSONObject jsonObject = new JSONObject(jsonPoint);
-            return jsonObject.optDouble("latitude", 0.0);
-        } catch (JSONException e) {
-            e.printStackTrace();
-            return 0.0;
-        }
+        return latitude;
     }
 
-    /**
-     * Extrait la longitude à partir du champ jsonPoint.
-     * @return La longitude, ou 0.0 si jsonPoint est mal formé ou inexistant.
-     */
     public double getLongitude() {
-        if (jsonPoint == null || jsonPoint.isEmpty()) {
-            return 0.0;
+        if (longitude == Double.MIN_VALUE) {
+            parseJsonPoint(); // Assurer une analyse en cas d'accès direct sans passer par setJsonPoint
         }
-        try {
-            JSONObject jsonObject = new JSONObject(jsonPoint);
-            return jsonObject.optDouble("longitude", 0.0);
-        } catch (JSONException e) {
-            e.printStackTrace();
-            return 0.0;
-        }
+        return longitude;
     }
 
 

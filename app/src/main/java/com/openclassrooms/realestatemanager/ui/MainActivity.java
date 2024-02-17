@@ -1,23 +1,21 @@
 package com.openclassrooms.realestatemanager.ui;
 
 
-import android.Manifest;
+
+import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.DatePickerDialog;
+
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.Signature;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
+
+import android.os.Build;
 import android.os.Bundle;
-import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ScrollView;
-import android.widget.Toast;
+
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -25,6 +23,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.fragment.app.Fragment;
@@ -68,6 +68,31 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private boolean isTwoPaneLayout; // Pour détecter si l'appareil est une tablette
 
 
+    private final int NOTIFICATION_ID = 1;
+
+
+
+    private final ActivityResultLauncher<Intent> editRealEstateLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                    result -> {
+                        if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                            RealEstate editedEstate = result.getData().getParcelableExtra("EDITED_REAL_ESTATE");
+
+                            // Mettre à jour ou ajouter de nouveaux médias
+                            viewModel.addNewMedia(editedEstate, editedEstate.getID());
+
+                            Log.d("lodi", "editRealEstateLauncher");
+
+                            updateLocalRealEstateList(editedEstate);
+                        }
+                        showRealEstateCreatedNotification();
+                    });
+
+
+
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,7 +100,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         initViewModel();
         configureUI();
         SyncDB();
-        // processIntent(getIntent());
+        createNotificationChannel();
+
+
+
 
 
         // Déterminer si l'appareil est une tablette
@@ -89,11 +117,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             setupPhoneView();
         }
 
-        // Configurer le bouton FAB pour ajouter un nouveau RealEstate
-        setupFabButton();
+
 
 
     }
+
+
 
 
     private void setupTabletView() {
@@ -113,13 +142,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .commit();
     }
 
-    private void setupFabButton() {
-        binding.fabAddRealEstate.setOnClickListener(view -> createNewRealEstate());
-    }
+
 
     private void createNewRealEstate() {
         Intent intent = new Intent(this, RealEstateEditor.class);
         editRealEstateLauncher.launch(intent);
+
         Log.d("lodi", "createNewRealEstate");
     }
 
@@ -166,6 +194,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         MenuItem searchMenuItem = menu.findItem(R.id.menu_search_button);
 
+
+
         if(filtered) {
             searchMenuItem.setIcon(R.drawable.baseline_close_24);
         } else {
@@ -190,6 +220,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         return super.onCreateOptionsMenu(menu);
     }
+
+
+
+
 
 /*
     //----- Bottom Navigation -----
@@ -303,23 +337,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
 
-        private final ActivityResultLauncher<Intent> editRealEstateLauncher =
-                registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
-                        result -> {
-                            if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
-                                RealEstate editedEstate = result.getData().getParcelableExtra("EDITED_REAL_ESTATE");
 
-                                // Mettre à jour ou ajouter de nouveaux médias
-                                viewModel.addNewMedia(editedEstate, editedEstate.getID());
-
-                                // Mettre à jour l'URL du média en vedette si nécessaire
-                                // viewModel.updateEstateFeaturedMediaUrl(ancienneUrl, nouvelleUrl);
-
-                                // Mise à jour de l'objet RealEstate dans votre liste locale si nécessaire
-                                // Vous devez trouver l'objet RealEstate correspondant dans votre liste et le mettre à jour
-                                updateLocalRealEstateList(editedEstate);
-                            }
-                        });
 
         private void updateLocalRealEstateList (RealEstate editedEstate){
             for (int i = 0; i < realEstateList.size(); i++) {
@@ -327,6 +345,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     realEstateList.set(i, editedEstate);
                     break;
                 }
+
+
             }
         }
 
@@ -363,6 +383,41 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         }
     }
+
+
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = getString(R.string.name_channel);
+            String description = getString(R.string.description_channel);
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(getString(R.string.id_channel), name, importance);
+            channel.setDescription(description);
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+
+            Log.d("lodi", "Channel Created ");
+
+        }
+    }
+
+
+
+    @SuppressLint("MissingPermission")
+    private void showRealEstateCreatedNotification() {
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, getString(R.string.id_channel))
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setContentTitle("Nouveau bien immobilier")
+                .setContentText("Un nouveau bien immobilier a été créé.")
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+        notificationManager.notify(NOTIFICATION_ID, builder.build());
+
+        Log.d("lodi", "Show Notification");
+
+    }
+
+
 
 
 

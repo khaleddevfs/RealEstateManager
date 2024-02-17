@@ -23,7 +23,7 @@ public interface RealEstateDao {
     long createOrUpdateRealEstate(RealEstate realEstate);
 
     @Delete
-    void deleteRealEstate(RealEstate realEstate);
+    int deleteRealEstate(RealEstate realEstate);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertMultipleRealEstates(List<RealEstate> realEstates);

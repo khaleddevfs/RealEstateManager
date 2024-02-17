@@ -19,12 +19,11 @@ public class MediaGalleryAdapter extends RecyclerView.Adapter<MediaGalleryViewHo
 
     Context context;
     List<RealEstateMedia> mediaList;
-    private MediaListItemBinding binding;
+
 
     public MediaGalleryAdapter(List<RealEstateMedia> mediaList, OnItemClickListener onItemClickListener) {
-       // this.binding = binding;
-        this.mediaList = mediaList;
-        onItemClickListener = onItemClickListener;
+         this.mediaList = mediaList;
+         onItemClickListener = onItemClickListener;
     }
     @NonNull
     @Override
@@ -67,4 +66,6 @@ public class MediaGalleryAdapter extends RecyclerView.Adapter<MediaGalleryViewHo
     public MediaGalleryClickListener getClickListener() {
         return clickListener;
     }
+
+
 }

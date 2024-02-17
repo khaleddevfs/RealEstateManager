@@ -10,8 +10,7 @@
         android:title="@string/search_button"
         app:showAsAction="ifRoom"
         android:checkable="true"
-        android:orderInCategory="3"/>
-
+        android:orderInCategory="4"/>
 
 
     <item
@@ -20,6 +19,9 @@
         android:title="@string/add"
         app:showAsAction="ifRoom"
         android:checkable="true"
-        android:orderInCategory="4"/>
+        android:orderInCategory="3"/>
+
+
+
 
 </menu>

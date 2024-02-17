@@ -22,6 +22,10 @@
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+
+
+
     <TextView
         android:id="@+id/agent_text_view"
         android:layout_width="wrap_content"
@@ -34,17 +38,15 @@
         android:text="@string/agent"
         />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/mediaGallery"
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/mediaViewPager"
         android:layout_width="match_parent"
-        android:layout_height="210dp"
-        android:orientation="horizontal"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        android:layout_height="0dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/mediaTextView"
-        tools:listitem="@layout/media_list_item"
+        app:layout_constraintBottom_toTopOf="@id/DescTitle"
+        android:orientation="horizontal"/>
 
-        />
 
     <TextView
         android:id="@+id/DescTitle"
@@ -56,7 +58,7 @@
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/mediaGallery" />
+        app:layout_constraintTop_toBottomOf="@id/mediaViewPager" />
 
     <TextView
         android:id="@+id/description"
@@ -182,6 +184,8 @@
             app:layout_constraintStart_toEndOf="@id/position_icon"
             app:layout_constraintTop_toTopOf="@id/position_icon"
             app:layout_constraintBottom_toBottomOf="@id/position_icon"/>
+
+
     </androidx.constraintlayout.widget.ConstraintLayout>
     <FrameLayout
         android:layout_width="match_parent"
@@ -201,6 +205,19 @@
             android:focusable="true"
             android:layout_gravity="center"/>
     </FrameLayout>
+
+    <Button
+        android:id="@+id/editRealEstateButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/edit_button"
+        android:drawableStart="@drawable/baseline_edit_24"
+        android:drawablePadding="8dp"
+        app:layout_constraintTop_toBottomOf="@id/map_container"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="16dp"/>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

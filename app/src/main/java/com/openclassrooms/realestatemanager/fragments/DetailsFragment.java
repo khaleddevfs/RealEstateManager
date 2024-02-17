@@ -5,9 +5,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,17 +17,16 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.Target;
 import com.openclassrooms.realestatemanager.R;
+import com.openclassrooms.realestatemanager.RealEstateEditor;
 import com.openclassrooms.realestatemanager.adapters.MediaGalleryAdapter;
 import com.openclassrooms.realestatemanager.database.RealEstateDao;
 import com.openclassrooms.realestatemanager.database.SaveRealEstateDB;
-import com.openclassrooms.realestatemanager.databinding.FragmentListBinding;
 import com.openclassrooms.realestatemanager.databinding.FragmentsDetailsBinding;
-import com.openclassrooms.realestatemanager.databinding.MediaListItemBinding;
 import com.openclassrooms.realestatemanager.event.OnItemClickListener;
 import com.openclassrooms.realestatemanager.event.OnMapCreated;
 import com.openclassrooms.realestatemanager.injection.ViewModelFactory;
@@ -52,12 +53,17 @@ public class DetailsFragment extends Fragment implements OnMapCreated, OnItemCli
 
     private ImagePopupWindow imagePopupWindow;
 
+    private ViewPager2 mediaViewPager2;
+
+
     private Context context;
 
 
     private RealEstateDao realEstateDao;
     RealEstate estate;
     private RealEstateViewModel viewModel;
+
+    private boolean isTwoPaneLayout; // Pour détecter si l'appareil est une tablette
 
     private LiveData<List<RealEstateMedia>> liveData;
     private Observer<List<RealEstateMedia>> observer;
@@ -90,14 +96,65 @@ public class DetailsFragment extends Fragment implements OnMapCreated, OnItemCli
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentsDetailsBinding.inflate(inflater, container, false);
+        mediaViewPager2 = binding.mediaViewPager;
+
         initializeViewModel();
         loadRealEstateData();
+
+
+
         return binding.getRoot();
     }
 
-    // ... [other lifecycle methods]
 
-    // Refactored methods for clarity and modularity
+
+
+
+
+   /* @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+
+
+        if (shouldShowEditMenu()) {
+            inflater.inflate(R.menu.edit_menu_phone, menu);
+        } else {
+            // Gonflez ici le menu par défaut si la condition n'est pas remplie
+            inflater.inflate(R.menu.main_menu_tablet, menu);
+        }
+    }
+
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_edit) {
+            // Assurez-vous que l'objet RealEstate `estate` est initialisé avec les détails à éditer
+            Intent intent = new Intent(getActivity(), RealEstateEditor.class);
+            intent.putExtra("REAL_ESTATE_TO_EDIT", estate); // 'estate' doit être Parcelable
+            startActivity(intent);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+    */
+
+
+    private void setupMediaGalleryViewPager() {
+        if (estate != null && mediaViewPager2 != null) { // Vérifiez aussi que mediaViewPager n'est pas null
+            viewModel.getRealEstateMediasByID(estate.getID()).observe(getViewLifecycleOwner(), mediaList -> {
+                if (mediaList != null && !mediaList.isEmpty()) {
+                    MediaGalleryAdapter adapter = new MediaGalleryAdapter(mediaList, this);
+                    binding.mediaViewPager.setAdapter(adapter);
+                }
+            });
+        }
+    }
+
+
+
+
+
     private void initializeComponents() {
        imagePopupWindow = new ImagePopupWindow();
         // Other initialization code
@@ -137,17 +194,21 @@ public class DetailsFragment extends Fragment implements OnMapCreated, OnItemCli
             if (!mapImageFile.exists()) {
                 // Télécharger et sauvegarder l'image localement
                 new SaveImageTask(getContext(), this).execute(mapImageUrl, mapImagePath);
-            } else {
+
+                Log.d("TAG", "mapImagePath: " + mapImagePath);
+
+        } else {
                 // L'image existe déjà, l'afficher
                 updateMap(mapImageFile);
             }
         }
+        setupMediaGalleryViewPager();
+
     }
 
 
 
     private void updateMediaGallery() {
-        // Logic for updating media gallery
     }
 
     private void updatePropertyDetails() {
@@ -177,21 +238,17 @@ public class DetailsFragment extends Fragment implements OnMapCreated, OnItemCli
     }
 
 
-    // ... [other methods]
 
-    // Observer methods refactored for simplicity
     private void mediaObserver(List<RealEstateMedia> mediaList) {
         estate.setMediaList(mediaList);
         setupMediaGallery(mediaList);
 
-        // Traitement des médias si nécessaire. Supposons que vous avez une logique pour déterminer si un téléchargement ou une mise à jour est nécessaire.
         processMediaList(mediaList);
     }
 
     private void setupMediaGallery(List<RealEstateMedia> mediaList) {
-        MediaGalleryAdapter mediaGalleryAdapter = new MediaGalleryAdapter(mediaList, this );
-        binding.mediaGallery.setAdapter(mediaGalleryAdapter);
-        binding.mediaGallery.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+        MediaGalleryAdapter mediaGalleryAdapter = new MediaGalleryAdapter(mediaList, this::onItemClick);
+        binding.mediaViewPager.setAdapter(mediaGalleryAdapter);
     }
 
     private void processMediaList(List<RealEstateMedia> mediaList) {
@@ -202,35 +259,25 @@ public class DetailsFragment extends Fragment implements OnMapCreated, OnItemCli
     }
 
     private void processMediaItem(RealEstateMedia media, int index, int totalSize) {
-        // Cette méthode devrait vérifier si les médias nécessitent un traitement, comme un téléchargement ou une mise à jour.
-        // Par exemple, vous pourriez vérifier si le fichier existe localement et le télécharger si nécessaire.
+
         if (!new File(media.getMediaUrl()).exists()) {
             downloadMedia(media, index, totalSize);
         } else {
             if (index == 0) {
                 updateFeaturedMediaUrl(media);
             }
-            // Votre logique pour traiter le dernier média si nécessaire.
         }
     }
 
     private void downloadMedia(RealEstateMedia media, int index, int totalSize) {
-        // Implémentez votre logique de téléchargement ici. Après le téléchargement :
-        // 1. Mettez à jour l'URL ou le chemin du fichier dans l'objet media.
-        // 2. Utilisez RealEstateMediaDao pour mettre à jour la base de données avec le nouveau chemin.
-        // 3. Si nécessaire, mettez à jour l'interface utilisateur après le téléchargement.
 
-        // Exemple fictif de mise à jour de l'objet et de la base de données :
         String newMediaUrl = "path/to/downloaded/media";
         media.setMediaURL(newMediaUrl);
-        // realEstateMediaDao.updateMedia(media); // Supposons que vous avez une instance de RealEstateMediaDao.
 
-        // Mettez à jour l'interface utilisateur si nécessaire.
         if (index == 0) {
             updateFeaturedMediaUrl(media);
         }
         if (index + 1 == totalSize) {
-            // Peut-être rafraîchir la galerie ou effectuer d'autres actions de fin.
         }
     }
 
@@ -254,7 +301,6 @@ public class DetailsFragment extends Fragment implements OnMapCreated, OnItemCli
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Tentez d'extraire l'objet RealEstate à partir des arguments du bundle.
         Bundle arguments = getArguments();
         if (arguments != null && arguments.containsKey("REAL_ESTATE")) {
             estate = arguments.getParcelable("REAL_ESTATE");
@@ -267,6 +313,17 @@ public class DetailsFragment extends Fragment implements OnMapCreated, OnItemCli
         }
 
         setupStaticMapClickListener();
+
+        binding.editRealEstateButton.setOnClickListener(v -> {
+            if (estate != null) {
+                Intent intent = new Intent(getActivity(), RealEstateEditor.class);
+                intent.putExtra("REAL_ESTATE_TO_EDIT", estate); // Assurez-vous que 'estate' est Parcelable.
+                startActivity(intent);
+            } else {
+                Log.e("DetailsFragment", "Aucun bien immobilier à éditer.");
+                // Vous pouvez également afficher un Toast pour informer l'utilisateur
+            }
+        });
     }
 
     private String extractLocationFromJsonPoint(String jsonPoint) {
@@ -282,8 +339,7 @@ public class DetailsFragment extends Fragment implements OnMapCreated, OnItemCli
     }
 
     private String getStaticMapUrl(String location) {
-        // Construisez l'URL pour une carte statique basée sur l'emplacement.
-        return "https://maps.googleapis.com/maps/api/staticmap?center=" + location + "&zoom=15&size=600x300&maptype=roadmap&markers=color:red%7Clabel:C%7C" + location + "&key=VOTRE_CLE_API";
+        return "https://maps.googleapis.com/maps/api/staticmap?center=" + location + "&zoom=15&size=600x300&maptype=roadmap&markers=color:red%7Clabel:C%7C" + location + getString(R.string.MAPS_API_KEY);
     }
 
     private void setupStaticMapClickListener() {

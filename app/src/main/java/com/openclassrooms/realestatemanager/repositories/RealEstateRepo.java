@@ -32,6 +32,10 @@ public class RealEstateRepo {
         return realEstateDao.createOrUpdateRealEstate(estate);
     }
 
+    public void deleteRealEstate(RealEstate estate) {
+        realEstateDao.deleteRealEstate(estate);
+    }
+
     /**
      * Filter real estates based on various criteria.
      */

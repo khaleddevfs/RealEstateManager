@@ -2,6 +2,7 @@ package com.openclassrooms.realestatemanager.adapters;
 
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -13,6 +14,9 @@ import com.openclassrooms.realestatemanager.models.RealEstate;
 
 public class RealEstateViewHolder extends RecyclerView.ViewHolder{
     private RealEstateListItemBinding binding;
+
+
+
     public RealEstateViewHolder(RealEstateListItemBinding binding) {
         super(binding.getRoot());
         this.binding = binding;
@@ -38,4 +42,8 @@ public class RealEstateViewHolder extends RecyclerView.ViewHolder{
     public TextView getRealEstatePrice() {
         return  binding.realEstatePrice;
     }
+
+    public ImageView getDeleteButton() {return   binding.deleteRealEstateButton;}
+
+
 }
