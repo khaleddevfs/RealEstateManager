@@ -7,15 +7,20 @@ import com.openclassrooms.realestatemanager.models.RealEstate;
 
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 /**
  * Repository for Real Estate operations.
  */
 public class RealEstateRepo {
     private final RealEstateDao realEstateDao;
+    private final Executor executor;
+
 
     public RealEstateRepo(RealEstateDao realEstateDao) {
         this.realEstateDao = realEstateDao;
+        this.executor = Executors.newSingleThreadExecutor(); // Créez un Executor pour les opérations asynchrones
     }
 
     /**
@@ -46,6 +51,10 @@ public class RealEstateRepo {
     /**
      * Update the featured media URL of a real estate.
      */
+
+    public void setRealEstateSoldStatus(long realEstateId, boolean isSold) {
+        executor.execute(() -> realEstateDao.setRealEstateSoldStatus(realEstateId, isSold));
+    }
     public void updateFeaturedMediaUrl(long realEstateId, String featuredMediaUrl) {
         realEstateDao.updateFeaturedMediaUrl(realEstateId, featuredMediaUrl);
     }

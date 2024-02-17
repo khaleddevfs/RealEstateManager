@@ -20,7 +20,7 @@ public class RealEstateViewHolder extends RecyclerView.ViewHolder{
     public RealEstateViewHolder(RealEstateListItemBinding binding) {
         super(binding.getRoot());
         this.binding = binding;
-        binding.getRoot();
+      //  binding.getRoot();
 
             }
 
@@ -45,5 +45,10 @@ public class RealEstateViewHolder extends RecyclerView.ViewHolder{
 
     public ImageView getDeleteButton() {return   binding.deleteRealEstateButton;}
 
+
+    // Méthode pour configurer la visibilité du badge "Vendu"
+    public void setSold(boolean isSold) {
+        binding.soldBadgeView.setVisibility(isSold ? View.VISIBLE : View.GONE);
+    }
 
 }

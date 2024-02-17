@@ -48,12 +48,12 @@
               <deviceKey>
                 <Key>
                   <type value="VIRTUAL_DEVICE_PATH" />
-                  <value value="C:\Users\khale\.android\avd\Pixel_Tablet_API_30.avd" />
+                  <value value="C:\Users\khale\.android\avd\Pixel_7_Pro_API_30.avd" />
                 </Key>
               </deviceKey>
             </Target>
           </targetSelectedWithDropDown>
-          <timeTargetWasSelectedWithDropDown value="2024-02-17T15:07:09.548953200Z" />
+          <timeTargetWasSelectedWithDropDown value="2024-02-17T23:16:08.953687100Z" />
         </State>
       </entry>
       <entry key="internet_should_be_available()">

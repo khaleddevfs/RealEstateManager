@@ -41,7 +41,7 @@
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/mediaViewPager"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="200dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/mediaTextView"
         app:layout_constraintBottom_toTopOf="@id/DescTitle"
@@ -206,7 +206,16 @@
             android:layout_gravity="center"/>
     </FrameLayout>
 
-    <Button
+    <CheckBox
+        android:id="@+id/statusCheckBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/sold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/map_container"
+        android:layout_marginTop="16dp"/>
+
+        <Button
         android:id="@+id/editRealEstateButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

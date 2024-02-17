@@ -57,6 +57,8 @@ public class RealEstateAdapter extends RecyclerView.Adapter<RealEstateViewHolder
     public void onBindViewHolder(@NonNull RealEstateViewHolder holder, int position) {
         Log.d("lodi", "onBindViewHolder: " + realEstateList.get(position).getName());
 
+        RealEstate realEstate = realEstateList.get(position);
+
         holder.getRealEstateName().setText(realEstateList.get(position).getName());
         holder.getRealEstateRegion().setText(realEstateList.get(position).getRegion());
         holder.getRealEstatePrice().setText(mContext.getString(R.string.price,realEstateList.get(position).getPrice()));
@@ -77,9 +79,16 @@ public class RealEstateAdapter extends RecyclerView.Adapter<RealEstateViewHolder
             listener.onItemClick(realEstateList.get(holder.getAdapterPosition()));
         });
 
+        if (realEstate.isSold()) {
+            holder.setSold(true); // Cette méthode ajustera la visibilité du badge "Vendu" selon l'état
+        } else {
+            holder.setSold(false);
+        }
 
-
+        // Gestion du badge "Vendu"
+       // holder.setSold(realEstate.isSold()); // Utilisation correcte de la méthode setSold
     }
+
 
 
     @Override

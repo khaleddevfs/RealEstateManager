@@ -14,6 +14,7 @@ import com.openclassrooms.realestatemanager.R;
 import com.openclassrooms.realestatemanager.databinding.PopupImageBinding;
 import com.openclassrooms.realestatemanager.models.RealEstateMedia;
 public class ImagePopupWindow {
+
     public void showPopup(View anchorView, RealEstateMedia media) {
         // Création de l'instance du binding pour le layout popup_image.
         PopupImageBinding binding = PopupImageBinding.inflate(LayoutInflater.from(anchorView.getContext()), (ViewGroup) anchorView.getParent(), false);

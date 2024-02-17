@@ -128,4 +128,9 @@ public class RealEstateViewModel extends ViewModel {
         });
     }
 
+    public void setRealEstateSoldStatus(long realEstateId, boolean isSold) {
+        executor.execute(() -> realEstateRepo.setRealEstateSoldStatus(realEstateId, isSold));
+    }
+
+
 }

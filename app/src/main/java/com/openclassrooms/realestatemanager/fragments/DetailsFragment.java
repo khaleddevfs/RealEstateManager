@@ -1,5 +1,6 @@
 package com.openclassrooms.realestatemanager.fragments;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -140,7 +142,7 @@ public class DetailsFragment extends Fragment implements OnMapCreated, OnItemCli
     */
 
 
-    private void setupMediaGalleryViewPager() {
+  /*  private void setupMediaGalleryViewPager() {
         if (estate != null && mediaViewPager2 != null) { // Vérifiez aussi que mediaViewPager n'est pas null
             viewModel.getRealEstateMediasByID(estate.getID()).observe(getViewLifecycleOwner(), mediaList -> {
                 if (mediaList != null && !mediaList.isEmpty()) {
@@ -150,6 +152,34 @@ public class DetailsFragment extends Fragment implements OnMapCreated, OnItemCli
             });
         }
     }
+
+   */
+
+
+    private void setupMediaGalleryViewPager() {
+        Log.d("DetailsFragment", "Préparation de la configuration du ViewPager pour l'immobilier: " + (estate == null ? "null" : estate.toString()));
+
+        if (estate != null) { // Assurez-vous que l'objet estate est initialisé
+            viewModel.getRealEstateMediasByID(estate.getID()).observe(getViewLifecycleOwner(), new Observer<List<RealEstateMedia>>() {
+                @SuppressLint("NotifyDataSetChanged")
+                @Override
+                public void onChanged(List<RealEstateMedia> mediaList) {
+                    Log.d("DetailsFragment", "Médias chargés: " + mediaList.size());
+                    // Reste du code...
+                    if (!mediaList.isEmpty()) {
+                        MediaGalleryAdapter adapter = new MediaGalleryAdapter(mediaList, DetailsFragment.this);
+                        mediaViewPager2.setAdapter(adapter);
+                        adapter.notifyDataSetChanged(); // Informez l'adaptateur que les données ont changé pour rafraîchir les vues.
+                    } else {
+                        Log.d("DetailsFragment", "La liste des médias est vide ou null");
+                    }
+                }
+            });
+        } else {
+            Log.e("DetailsFragment", "L'objet estate est null lors de la configuration du ViewPager");
+        }
+    }
+
 
 
 
@@ -202,7 +232,7 @@ public class DetailsFragment extends Fragment implements OnMapCreated, OnItemCli
                 updateMap(mapImageFile);
             }
         }
-        setupMediaGalleryViewPager();
+
 
     }
 
@@ -314,6 +344,11 @@ public class DetailsFragment extends Fragment implements OnMapCreated, OnItemCli
 
         setupStaticMapClickListener();
 
+        mediaViewPager2 = binding.mediaViewPager;
+
+        setupMediaGalleryViewPager();
+
+
         binding.editRealEstateButton.setOnClickListener(v -> {
             if (estate != null) {
                 Intent intent = new Intent(getActivity(), RealEstateEditor.class);
@@ -323,6 +358,12 @@ public class DetailsFragment extends Fragment implements OnMapCreated, OnItemCli
                 Log.e("DetailsFragment", "Aucun bien immobilier à éditer.");
                 // Vous pouvez également afficher un Toast pour informer l'utilisateur
             }
+        });
+
+        CheckBox soldCheckBox = view.findViewById(R.id.statusCheckBox); // Assurez-vous d'avoir le bon ID
+        soldCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            // Ici, vous pouvez soit envoyer l'état directement à ListFragment via une interface de callback ou un ViewModel
+            viewModel.setRealEstateSoldStatus(estate.getID(), isChecked);
         });
     }
 

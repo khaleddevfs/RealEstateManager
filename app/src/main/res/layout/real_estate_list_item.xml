@@ -4,6 +4,11 @@ xmlns:app="http://schemas.android.com/apk/res-auto"
 android:layout_width="match_parent"
 android:layout_height="110dp"
 android:layout_gravity="start">
+
+
+
+
+
     <ImageView
         android:id="@+id/real_estate_image"
         android:layout_width="100dp"
@@ -13,6 +18,20 @@ android:layout_gravity="start">
         app:layout_constraintStart_toStartOf="parent"
         android:contentDescription="@null"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/soldBadgeView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/quantum_orange700"
+        android:textColor="@android:color/white"
+        android:text="@string/sold"
+        android:padding="4dp"
+        android:visibility="gone"
+        android:textSize="12sp"
+        android:layout_margin="8dp"
+        app:layout_constraintEnd_toEndOf="@id/real_estate_image"
+        app:layout_constraintTop_toTopOf="@id/real_estate_image"/>
 
     <TextView
         android:id="@+id/real_estate_name"
@@ -63,6 +82,9 @@ android:layout_gravity="start">
         android:background="?attr/selectableItemBackgroundBorderless"
         android:layout_marginEnd="16dp"
        android:layout_marginTop="16dp"/>
+
+
+
 
 
 

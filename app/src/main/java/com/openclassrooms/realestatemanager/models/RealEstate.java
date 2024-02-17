@@ -148,6 +148,9 @@ public class RealEstate implements Parcelable {
     Date saleDate;
     @PrimaryKey(autoGenerate = true)
     private long id;
+
+    @ColumnInfo(name = "is_sold")
+    private boolean isSold; // Champ pour stocker l'état de vente
     private String name;
 
     private String jsonPoint;
@@ -185,6 +188,8 @@ public class RealEstate implements Parcelable {
         bathrooms = in.readInt();
         bedrooms = in.readInt();
         mediaList = in.createTypedArrayList(RealEstateMedia.CREATOR);
+        isSold = in.readByte() != 0; // isSold
+
 
         long l = in.readLong();
         if(l != 0) {
@@ -221,6 +226,9 @@ public class RealEstate implements Parcelable {
         dest.writeInt(bathrooms);
         dest.writeInt(bedrooms);
         dest.writeTypedList(mediaList);
+
+        dest.writeByte((byte) (isSold ? 1 : 0)); // isSold
+
         if(saleDate == null)
         {
             dest.writeLong(0);
@@ -325,6 +333,8 @@ public class RealEstate implements Parcelable {
     public void setAgentName(String agentName) {
         this.agentName = agentName;
     }
+
+
 
 
 
@@ -481,6 +491,7 @@ public class RealEstate implements Parcelable {
         this.price = priceInDollar;
     }
 
+
     public HashMap<String, Object> toHashMap() {
         HashMap<String, Object> map = new HashMap<>();
 
@@ -609,5 +620,16 @@ public class RealEstate implements Parcelable {
         this.id = id;
     }
 
+    // Getter pour isSold
+    public boolean isSold() {
+        return isSold;
+    }
+
+    // Setter pour isSold
+    public void setSold(boolean sold) {
+        isSold = sold;
+
+
+    }
 }
 

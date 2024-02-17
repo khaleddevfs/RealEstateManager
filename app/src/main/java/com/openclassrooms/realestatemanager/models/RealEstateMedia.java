@@ -13,10 +13,6 @@ import androidx.room.PrimaryKey;
 
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import java.util.HashMap;
 import java.util.Objects;
 
 @Entity(foreignKeys = @ForeignKey(entity = RealEstate.class, parentColumns = "id", childColumns = "realEstateId"),
@@ -35,7 +31,7 @@ public class RealEstateMedia implements Parcelable {
 
     @Ignore
     private Boolean isSync = false;
-    private String firestoreUrl = "";
+
 
     protected RealEstateMedia(Parcel in) {
         mediaUrl = in.readString();
@@ -44,7 +40,7 @@ public class RealEstateMedia implements Parcelable {
         id = in.readLong();
         byte tmpIsSync = in.readByte();
         isSync = tmpIsSync == 0 ? null : tmpIsSync == 1;;
-        firestoreUrl = in.readString();
+
     }
 
     public static final Creator<RealEstateMedia> CREATOR = new Creator<RealEstateMedia>() {
@@ -65,21 +61,17 @@ public class RealEstateMedia implements Parcelable {
         return isSync;
     }
 
-    public String getFirestoreUrl() {
-        return firestoreUrl;
-    }
 
 
     public void setSync(Boolean sync) {
         isSync = sync;
     }
 
-    public RealEstateMedia(long id, long realEstateId, @NonNull String mediaUrl, @NonNull String mediaCaption,String firestoreUrl) {
+    public RealEstateMedia(long id, long realEstateId, @NonNull String mediaUrl, @NonNull String mediaCaption) {
         this.id = id;
         this.realEstateId = realEstateId;
         this.mediaUrl = mediaUrl;
         this.mediaCaption = mediaCaption;
-        this.firestoreUrl = firestoreUrl;
     }
 
     @Ignore
@@ -122,15 +114,7 @@ public class RealEstateMedia implements Parcelable {
         this.mediaCaption = mediaCaption;
     }
 
-    public HashMap<String, Object> toHashMap(String agentName) {
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("mediaUrl", firestoreUrl);
-        map.put("mediaCaption",mediaCaption);
-        map.put("realEstateId",agentName + realEstateId);
 
-        return map;
-
-    }
 
     public static RealEstateMedia fromQueryDocumentSnapshot(QueryDocumentSnapshot document, String agent) {
 
@@ -156,9 +140,6 @@ public class RealEstateMedia implements Parcelable {
     }
 
 
-    public void setFirestoreUrl(String url) {
-        firestoreUrl = url;
-    }
 
     @Override
     public int describeContents() {
@@ -172,7 +153,7 @@ public class RealEstateMedia implements Parcelable {
         parcel.writeLong(realEstateId);
         parcel.writeLong(id);
         parcel.writeByte((byte) (isSync != null && isSync ? 1 : 0));
-        parcel.writeString(firestoreUrl);
+
     }
 
     public long getId() {

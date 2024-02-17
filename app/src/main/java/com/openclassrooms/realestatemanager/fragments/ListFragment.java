@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 
@@ -170,6 +171,9 @@ public class ListFragment extends Fragment implements RealEstateAdapter.OnItemCl
             realEstateList.addAll(realEstates);
             adapter.notifyDataSetChanged();
         });
+
+
+
     }
 
     @Override

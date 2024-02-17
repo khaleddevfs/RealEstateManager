@@ -20,15 +20,18 @@ public class MediaGalleryAdapter extends RecyclerView.Adapter<MediaGalleryViewHo
     Context context;
     List<RealEstateMedia> mediaList;
 
+    private OnItemClickListener onItemClickListener;
+
+
 
     public MediaGalleryAdapter(List<RealEstateMedia> mediaList, OnItemClickListener onItemClickListener) {
          this.mediaList = mediaList;
-         onItemClickListener = onItemClickListener;
+         this.onItemClickListener = onItemClickListener;
     }
     @NonNull
     @Override
     public MediaGalleryViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-         MediaListItemBinding binding = MediaListItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+        MediaListItemBinding binding = MediaListItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
         context = parent.getContext();
         return new MediaGalleryViewHolder(binding);
     }
@@ -41,6 +44,13 @@ public class MediaGalleryAdapter extends RecyclerView.Adapter<MediaGalleryViewHo
                 .into(holder.getImage());
 
         holder.getCaption().setText(mediaList.get(position).getMediaCaption());
+
+        // Ajouter un écouteur de clic sur l'élément de la galerie
+        holder.itemView.setOnClickListener(v -> {
+            if (onItemClickListener != null) {
+                onItemClickListener.onItemClick(mediaList.get(position));
+            }
+        });
     }
 
     @Override
