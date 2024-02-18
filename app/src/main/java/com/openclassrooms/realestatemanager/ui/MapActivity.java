@@ -21,9 +21,30 @@ public class MapActivity extends AppCompatActivity {
         setContentView(R.layout.activity_map);
 
 
-        RealEstateViewModel realEstateViewModel = new ViewModelProvider(this, ViewModelFactory.getInstance(this)).get(RealEstateViewModel.class);
-        realEstateViewModel.getRealEstates().observe(this,this::getEstatesObserver);
+       // RealEstateViewModel realEstateViewModel = new ViewModelProvider(this, ViewModelFactory.getInstance(this)).get(RealEstateViewModel.class);
+     //   realEstateViewModel.getRealEstates().observe(this,this::getEstatesObserver);
 
+        RealEstate receivedEstate = getIntent().getParcelableExtra("realEstateData");
+
+        if(receivedEstate != null) {
+            // Si un RealEstate spécifique est reçu, affichez-le sur la carte
+            displaySingleEstateOnMap(receivedEstate);
+        } else {
+            // Sinon, affichez tous les biens immobiliers
+            displayAllEstatesOnMap();
+        }
+    }
+
+    private void displaySingleEstateOnMap(RealEstate realEstate) {
+        MapFragment mapFragment = MapFragment.newInstance(realEstate);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.map_container, mapFragment)
+                .commit();
+    }
+
+    private void displayAllEstatesOnMap() {
+        RealEstateViewModel realEstateViewModel = new ViewModelProvider(this, ViewModelFactory.getInstance(this)).get(RealEstateViewModel.class);
+        realEstateViewModel.getRealEstates().observe(this, this::getEstatesObserver);
     }
 
     private void getEstatesObserver(List<RealEstate> realEstateList) {

@@ -2,6 +2,8 @@ package com.openclassrooms.realestatemanager.fragments;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -27,6 +29,7 @@ import com.openclassrooms.realestatemanager.R;
 import com.openclassrooms.realestatemanager.databinding.FragmentMapBinding;
 import com.openclassrooms.realestatemanager.models.RealEstate;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -113,7 +116,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, EasyPer
         }
         Log.d("lodi", "onMapReady"  );
 
-        setupMarkers(); // Assurez-vous que cette méthode est appelée ici
     }
     private boolean checkLocationPermissions() {
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
@@ -148,6 +150,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, EasyPer
             Log.e("MapFragment", "Erreur de sécurité en récupérant la localisation : ", e);
         }
     }
+    public void updateRealEstateData(RealEstate newEstate) {
+        this.estate = newEstate; // Mise à jour de la propriété avec les nouvelles données
+        if (googleMap != null) {
+            googleMap.clear(); // Effacez tous les marqueurs existants sur la carte
+            setupMarkers(); // Ajoutez de nouveau les marqueurs avec les données mises à jour
+        }
+    }
+
 
 
 
@@ -163,12 +173,35 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, EasyPer
         }
     }
 
-    private void addMarker(RealEstate estate) {
+    /*private void addMarker(RealEstate estate) {
         // Vous devez définir getLatitude() et getLongitude() dans votre modèle RealEstate
         LatLng position = new LatLng(estate.getLatitude(), estate.getLongitude());
         googleMap.addMarker(new MarkerOptions().position(position).title(estate.getName()));
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position, DEFAULT_ZOOM_LEVEL));
         Log.d("lodi", "AddMarker"  );
+    }
+
+     */
+    private void addMarker(RealEstate estate) {
+        // Créez une instance de Geocoder
+        Geocoder geocoder = new Geocoder(getContext());
+        List<Address> addresses;
+        try {
+            // Effectuez le géocodage de l'adresse. Remplacez "estate.getAddress()" par votre méthode d'obtention de l'adresse
+            addresses = geocoder.getFromLocationName(estate.getLocation(), 1);
+            if (addresses != null && !addresses.isEmpty()) {
+                Address address = addresses.get(0);
+                // Utilisez les coordonnées de l'adresse pour créer un LatLng
+                LatLng position = new LatLng(address.getLatitude(), address.getLongitude());
+                googleMap.addMarker(new MarkerOptions().position(position).title(estate.getName()));
+                if (estate == this.estate) {
+                    // Si c'est l'immobilier en question, centrez la caméra sur ce marqueur
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position, DEFAULT_ZOOM_LEVEL));
+                }
+            }
+        } catch (IOException e) {
+            Log.e("MapFragment", "Erreur de géocodage : ", e);
+        }
     }
 
     @Override

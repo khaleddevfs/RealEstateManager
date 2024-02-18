@@ -50,7 +50,7 @@ public interface RealEstateDao {
      * @param realEstateId L'identifiant du bien immobilier.
      * @param isSold Le nouveau statut de vente (true pour vendu, false sinon).
      */
-    @Query("UPDATE RealEstate SET isSold = :isSold WHERE id = :realEstateId")
+    @Query("UPDATE RealEstate SET is_sold = :isSold WHERE id = :realEstateId")
     void setRealEstateSoldStatus(long realEstateId, boolean isSold);
 
 

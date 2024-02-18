@@ -21,7 +21,7 @@
     <string name="search_button">Search</string>
     <string name="edit_button">Edit</string>
     <string name="price">%d €</string>
-    <string name="sold">Sold : %s</string>
+    <string name="sold">Sold</string>
     delete_real_estate
     <string name="delete_real_estate">Delete</string>
 

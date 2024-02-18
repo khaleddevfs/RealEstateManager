@@ -606,7 +606,9 @@ public class RealEstate implements Parcelable {
 
         if(values.containsKey("listing_date")) estate.setListingDate(new Date(values.getAsLong("listing_date")));
 
-        if(values.containsKey("sale_date")) estate.setSaleDate(new Date(values.getAsLong("sale_date")));
+        if(values.containsKey("is_sold")) {estate.setSold(values.getAsBoolean("is_sold"));
+        }
+
 
         return estate;
     }

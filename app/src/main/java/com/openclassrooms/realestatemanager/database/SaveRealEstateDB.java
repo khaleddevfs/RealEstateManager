@@ -63,7 +63,7 @@ public abstract class SaveRealEstateDB extends RoomDatabase {
     public abstract RealEstateDao realEstateDao();
     public abstract RealEstateMediaDao realEstateMediaDao();
 
-    static final Migration MIGRATION_3_4 = new Migration(3, 4) {
+    static final Migration MIGRATION_1_2 = new Migration(1, 2) {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
             database.execSQL("ALTER TABLE RealEstate ADD COLUMN isSold INTEGER NOT NULL DEFAULT 0");
@@ -77,7 +77,7 @@ public abstract class SaveRealEstateDB extends RoomDatabase {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                                     SaveRealEstateDB.class, "MyDatabase.db")
-                            .addMigrations(MIGRATION_3_4) // Ajoutez cette ligne pour appliquer la migration
+                            .addMigrations(MIGRATION_1_2) // Ajoutez cette ligne pour appliquer la migration
                             .build();
                 }
             }

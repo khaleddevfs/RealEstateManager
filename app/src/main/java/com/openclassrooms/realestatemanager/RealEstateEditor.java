@@ -479,6 +479,8 @@ public class RealEstateEditor extends AppCompatActivity {
 }*/
 
 
+import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.NotificationChannel;
@@ -511,10 +513,21 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.model.TypeFilter;
+import com.google.android.libraries.places.widget.Autocomplete;
+import com.google.android.libraries.places.widget.AutocompleteActivity;
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.openclassrooms.realestatemanager.adapters.RealEstateEditorRvAdapter;
 import com.openclassrooms.realestatemanager.adapters.RealEstateEditorRvViewHolder;
 import com.openclassrooms.realestatemanager.database.SaveRealEstateDB;
 import com.openclassrooms.realestatemanager.databinding.ActivityRealEstateEditorBinding;
+import com.openclassrooms.realestatemanager.fragments.MapFragment;
 import com.openclassrooms.realestatemanager.injection.ViewModelFactory;
 import com.openclassrooms.realestatemanager.models.RealEstate;
 import com.openclassrooms.realestatemanager.models.RealEstateMedia;
@@ -524,6 +537,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -546,11 +560,23 @@ public class RealEstateEditor extends AppCompatActivity {
 
     private AlertDialog.Builder photoOrGalleryDialogBuilder;
 
+    private LatLng selectedLocationLatLng;
+    private String selectedLocationAddress;
+
+
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityRealEstateEditorBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+
+        if (!Places.isInitialized()) {
+            Places.initialize(getApplicationContext(), getString(R.string.MAPS_API_KEY));
+        }
 
         adapter = new RealEstateEditorRvAdapter(mediaList);
         binding.rvSelectedPhotos.setAdapter(adapter);
@@ -559,6 +585,7 @@ public class RealEstateEditor extends AppCompatActivity {
         realEstateViewModel = new ViewModelProvider(this, factory).get(RealEstateViewModel.class);
 
         initializeUI();
+        initializePlaces();
         loadRealEstateData();
 
         realEstateViewModel.isSaveOperationComplete().observe(this, isComplete -> {
@@ -576,8 +603,40 @@ public class RealEstateEditor extends AppCompatActivity {
         }
     }
 
+    private void initializePlaces() {
+   // Initialisation du SDK Places
+        if (!Places.isInitialized()) {
+            Places.initialize(getApplicationContext(),  getString(R.string.MAPS_API_KEY));
+        }
+
+// Création d'une instance de l'AutocompleteSupportFragment
+        AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
+                getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+
+// Configuration des types de lieux à rechercher
+        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG));
+
+// Écouteur pour la sélection d'un lieu
+        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(@NonNull Place place) {
+                Log.i(TAG, "Place: " + place.getName() + ", " + place.getLatLng());
+                selectedLocationLatLng = place.getLatLng(); // Stockez la latitude et la longitude
+                selectedLocationAddress = place.getAddress(); // Stockez l'adresse complète
+            }
+
+            @Override
+            public void onError(@NonNull Status status) {
+                Log.i(TAG, "An error occurred: " + status);
+            }
+        });
+
+
+
+
+    }
+
     private void initializeUI() {
-        // Simplification de la gestion des écouteurs d'événements
         binding.ivPhoto.setOnClickListener(view -> {
             setupPhotoOrGalleryDialog();
             checkPermissions();
@@ -625,7 +684,7 @@ public class RealEstateEditor extends AppCompatActivity {
         // Appliquez le même écouteur à tous les EditText pertinents
         binding.etBathrooms.setOnFocusChangeListener(listener);
         binding.etPrice.setOnFocusChangeListener(listener);
-        binding.etLocation.setOnFocusChangeListener(listener);
+      //  binding.etLocation.setOnFocusChangeListener(listener);
         binding.etSurface.setOnFocusChangeListener(listener);
         binding.etRooms.setOnFocusChangeListener(listener);
         binding.etBedrooms.setOnFocusChangeListener(listener);
@@ -652,7 +711,7 @@ public class RealEstateEditor extends AppCompatActivity {
             mediaList = realEstate.getMediaList();
             binding.rvSelectedPhotos.setAdapter(new RealEstateEditorRvAdapter(mediaList));
             binding.etSurface.setText(String.format(Locale.getDefault(), "%d", realEstate.getSurface()));
-            binding.etLocation.setText(realEstate.getLocation());
+          //  binding.etLocation.setText(realEstate.getLocation());
             binding.etPrice.setText(String.format(Locale.getDefault(), "%d", realEstate.getPrice()));
         }
         binding.btSave.setOnClickListener(view -> btSaveClick());
@@ -862,7 +921,12 @@ public class RealEstateEditor extends AppCompatActivity {
         realEstate.setRegion(binding.etRegion.getText().toString());
         realEstate.setDescription(binding.textInputEditTextDescription.getText().toString());
         realEstate.setPrice(Integer.parseInt(binding.etPrice.getText().toString()));
-        realEstate.setLocation(binding.etLocation.getText().toString());
+       // realEstate.setLocation(binding.etLocation.getText().toString());
+        // Utilisez les informations de localisation
+        if (selectedLocationLatLng != null) {
+            realEstate.setJsonPoint(createRealEstate().getJsonPoint()); // Assurez-vous d'avoir un champ pour cela dans votre modèle
+            realEstate.setLocation(selectedLocationAddress); // Utilisez l'adresse comme champ de localisation
+        }
         realEstate.setSurface(Integer.parseInt(binding.etSurface.getText().toString()));
         realEstate.setRooms(Integer.parseInt(binding.etRooms.getText().toString()));
         realEstate.setBedrooms(Integer.parseInt(binding.etBedrooms.getText().toString()));
