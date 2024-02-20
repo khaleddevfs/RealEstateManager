@@ -43,7 +43,6 @@ public class RealEstateViewHolder extends RecyclerView.ViewHolder{
         return  binding.realEstatePrice;
     }
 
-    public ImageView getDeleteButton() {return   binding.deleteRealEstateButton;}
 
 
     // Méthode pour configurer la visibilité du badge "Vendu"

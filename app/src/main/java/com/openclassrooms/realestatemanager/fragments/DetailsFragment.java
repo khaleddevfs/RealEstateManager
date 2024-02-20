@@ -2,24 +2,27 @@ package com.openclassrooms.realestatemanager.fragments;
 
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
+
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
@@ -28,6 +31,9 @@ import androidx.viewpager2.widget.ViewPager2;
 
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.openclassrooms.realestatemanager.R;
 import com.openclassrooms.realestatemanager.RealEstateEditor;
@@ -78,6 +84,7 @@ public class DetailsFragment extends Fragment implements OnMapCreated, OnItemCli
 
     private Context context;
 
+    private final int NOTIFICATION_ID = 1;
 
 
 
@@ -147,10 +154,8 @@ public class DetailsFragment extends Fragment implements OnMapCreated, OnItemCli
 
 
     private void updateUi() {
-        updateMediaGallery();
         updatePropertyDetails();
-        // Mettez à jour l'interface utilisateur ici
-        // Vérifiez que vous avez des coordonnées valides avant d'appeler downloadAndSaveMapImage
+
         if (estate != null && estate.getLatitude() != 0 && estate.getLongitude() != 0) {
             String mapImageUrl = generateMapImageUrl(estate.getLatitude(), estate.getLongitude());
             File mapImageFile = new File(getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), "map_image.png");
@@ -159,62 +164,6 @@ public class DetailsFragment extends Fragment implements OnMapCreated, OnItemCli
             Log.e("DetailsFragment", "Coordonnées invalides ou objet estate non initialisé");
         }
     }
-
-
-
-
-  /* @Override
-   public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-       super.onCreateOptionsMenu(menu, inflater);
-
-
-
-
-       if (shouldShowEditMenu()) {
-           inflater.inflate(R.menu.edit_menu_phone, menu);
-       } else {
-           // Gonflez ici le menu par défaut si la condition n'est pas remplie
-           inflater.inflate(R.menu.main_menu_tablet, menu);
-       }
-   }
-
-
-
-
-
-
-   @Override
-   public boolean onOptionsItemSelected(MenuItem item) {
-       if (item.getItemId() == R.id.action_edit) {
-           // Assurez-vous que l'objet RealEstate `estate` est initialisé avec les détails à éditer
-           Intent intent = new Intent(getActivity(), RealEstateEditor.class);
-           intent.putExtra("REAL_ESTATE_TO_EDIT", estate); // 'estate' doit être Parcelable
-           startActivity(intent);
-           return true;
-       }
-       return super.onOptionsItemSelected(item);
-   }
-   */
-
-
-
-
- /*  private void setupMediaGalleryViewPager() {
-       if (estate != null && mediaViewPager2 != null) { // Vérifiez aussi que mediaViewPager n'est pas null
-           viewModel.getRealEstateMediasByID(estate.getID()).observe(getViewLifecycleOwner(), mediaList -> {
-               if (mediaList != null && !mediaList.isEmpty()) {
-                   MediaGalleryAdapter adapter = new MediaGalleryAdapter(mediaList, this);
-                   binding.mediaViewPager.setAdapter(adapter);
-               }
-           });
-       }
-   }
-
-
-  */
-
-
-
 
     private void setupMediaGalleryViewPager() {
         Log.d("DetailsFragment", "Préparation de la configuration du ViewPager pour l'immobilier: " + (estate == null ? "null" : estate.toString()));
@@ -283,55 +232,7 @@ public class DetailsFragment extends Fragment implements OnMapCreated, OnItemCli
         Log.e("DetailsFragment", "generateMapImageUrl");
         return "https://maps.googleapis.com/maps/api/staticmap?center=" + latitude + "," + longitude + "&zoom=15&size=600x300&maptype=roadmap&markers=color:red%7C" + latitude + "," + longitude + "&key=" + apiKey;
     }
-/*
-   private void updateUi() {
-       updateMediaGallery();
-       updatePropertyDetails();
 
-
-       if (estate != null) {
-           double latitude = estate.getLatitude();
-           double longitude = estate.getLongitude();
-           if (latitude != 0 && longitude != 0) {
-               String mapImageUrl = generateMapImageUrl(latitude, longitude);
-               Glide.with(this).load(mapImageUrl).into(binding.staticMap);
-               Log.e("DetailsFragment", "updateUi with static map" + mapImageUrl);
-           }
-       }
-
-
-
-
-   }
-
-
-*/
-   /*
-private void updateUi() {
-   updateMediaGallery();
-   updatePropertyDetails();
-
-
-   if (estate != null) {
-       double latitude = estate.getLatitude();
-       double longitude = estate.getLongitude();
-       if (latitude != 0 && longitude != 0) {
-           String mapImageUrl = generateMapImageUrl(latitude, longitude);
-           // Définissez le chemin du fichier où vous souhaitez sauvegarder l'image de la carte
-           File mapImageFile = new File(getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), "map_image.png");
-
-
-           // Assurez-vous que la méthode downloadAndSaveMapImage est appelée avec les bons paramètres
-           downloadAndSaveMapImage(mapImageUrl, mapImageFile);
-
-
-           Log.e("DetailsFragment", "updateUi with static map: " + mapImageUrl);
-       }
-   }
-}
-
-
-    */
 
 
     private void downloadAndSaveMapImage(String mapImageUrl, File mapImageFile) {
@@ -346,13 +247,6 @@ private void updateUi() {
             }
         }).execute(mapImageUrl, mapImageFile.getAbsolutePath());
     }
-
-
-
-
-    private void updateMediaGallery() {
-    }
-
 
     private void updatePropertyDetails() {
         liveData = viewModel.getRealEstateMediasByID(estate.getID());
@@ -370,7 +264,7 @@ private void updateUi() {
         Log.d("TAG", "onCreateView: " + estate.toString());
     }
 
-
+/*
     private void updateMap(File mapImageFile) {
         if (isAdded()) {
             if (getActivity() != null) {
@@ -384,6 +278,28 @@ private void updateUi() {
 
     }
 
+ */
+
+    private void updateMap(File mapImageFile) {
+        if (isAdded() && getActivity() != null) {
+            Glide.with(requireActivity())
+                    .load(mapImageFile)
+                    .override(Target.SIZE_ORIGINAL)
+                    .listener(new RequestListener<Drawable>() {
+                        @Override
+                        public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                            Log.e("DetailsFragment", "Erreur de chargement de l'image : ", e);
+                            return false; // Important pour indiquer si l'événement a été géré.
+                        }
+
+                        @Override
+                        public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                            return false; // Ici aussi, indique si l'événement a été géré.
+                        }
+                    })
+                    .into(binding.staticMap);
+        }
+    }
 
 
 
@@ -493,9 +409,11 @@ private void updateUi() {
 
         // Bouton d'édition
         binding.editRealEstateButton.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), RealEstateEditor.class);
-            intent.putExtra("REAL_ESTATE_TO_EDIT", estate);
-            startActivity(intent);
+            if (estate != null) {
+                launchEditRealEstateActivity(estate);
+            } else {
+                Log.e("DetailsFragment", "Aucun bien immobilier à éditer.");
+            }
         });
 
 
@@ -519,10 +437,38 @@ private void updateUi() {
                 estate.setSaleDate(null); // Réinitialise la date de vente
                 saleDateTextView.setVisibility(View.GONE);
                 updateEstateInDatabase(); // Mise à jour de l'objet RealEstate dans la base de données
+
             }
         });
     }
 
+    private void launchEditRealEstateActivity(RealEstate realEstate) {
+        if (getActivity() != null) {
+            Intent intent = new Intent(getActivity(), RealEstateEditor.class);
+            intent.putExtra("REAL_ESTATE_TO_EDIT", realEstate); // Assurez-vous que RealEstate implémente Parcelable
+            editRealEstateLauncher.launch(intent);
+        } else {
+            Log.e("DetailsFragment", "Activity is null");
+        }
+    }
+
+
+
+    // Gestionnaire du résultat de l'activité d'édition
+    private final ActivityResultLauncher<Intent> editRealEstateLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                    RealEstate updatedEstate = result.getData().getParcelableExtra("UPDATED_REAL_ESTATE");
+                    updateRealEstateInDatabase(updatedEstate);
+                }
+                Log.e("DetailsFragment", "ActivityResultLauncher");
+            });
+
+    // Méthode pour mettre à jour le RealEstate et ses médias dans la base de données
+    private void updateRealEstateInDatabase(RealEstate updatedEstate) {
+        viewModel.createOrUpdateRealEstate(updatedEstate);
+        Log.e("DetailsFragment", "updateRealEstateInDatabase");
+    }
 
     private void updateEstateInDatabase() {
         if (viewModel != null) {
@@ -531,6 +477,8 @@ private void updateUi() {
             Log.e("DetailsFragment", "ViewModel n'est pas initialisé.");
         }
     }
+
+
 
 
     private void showDatePicker() {
@@ -544,6 +492,7 @@ private void updateUi() {
             binding.saleDateTextView.setText(dateFormat.format(saleDate));
             binding.saleDateTextView.setVisibility(View.VISIBLE);
             updateEstateInDatabase(); // Mise à jour de l'objet RealEstate dans la base de données
+
         }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
 
 
@@ -667,17 +616,18 @@ private void updateUi() {
 
 
 
-// path/filename: com/openclassrooms/realestatemanager/fragments/DetailsFragment.java
+
 
 
 
 
     private String extractLocationFromJsonPoint(String jsonPoint) {
         // Vérifiez si jsonPoint est null avant de continuer
-        if (jsonPoint == null || jsonPoint.isEmpty()) {
+     if (jsonPoint == null || jsonPoint.isEmpty()) {
             Log.e("DetailsFragment", "jsonPoint est null ou vide.");
             return "0,0"; // Retourner une valeur par défaut pour éviter l'exception
         }
+
 
 
         try {

@@ -10,7 +10,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/amount"
-        android:inputType="numberDecimal"/>
+        android:inputType="numberDecimal"
+        android:background="@drawable/edit_text_background"
+        android:textColor="@color/editTextTextColor"
+        android:padding="12dp"/>
 
     <SeekBar
         android:id="@+id/sbInterestRate"
@@ -18,7 +21,9 @@
         android:layout_height="wrap_content"
         android:max="100"
         android:progress="25"
-        android:layout_marginTop="16dp"/>
+        android:layout_marginTop="16dp"
+        android:thumbTint="@color/colorPrimary"
+        android:progressTint="@color/colorAccent"/>
 
     <TextView
         android:id="@+id/tvInterestRate"
@@ -26,22 +31,26 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:text="@string/initial_interest_rate"
-        android:layout_marginTop="16dp"/>
-
+        android:layout_marginTop="16dp"
+        android:textColor="@color/textViewTextColor"/>
 
     <EditText
         android:id="@+id/etLoanPeriod"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/period"
-        android:inputType="number"/>
+        android:inputType="number"
+        android:background="@drawable/edit_text_background"
+        android:textColor="@color/editTextTextColor"
+        android:padding="12dp"/>
 
     <Button
         android:id="@+id/btnCalculate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:text="@string/calculate"/>
+        android:text="@string/calculate"
+        style="@style/Widget.AppCompat.Button.Colored"/>
 
     <TextView
         android:id="@+id/tvMonthlyPayment"
@@ -49,6 +58,7 @@
         android:layout_height="wrap_content"
         android:textSize="18sp"
         android:layout_marginTop="16dp"
-        android:text="@string/monthly_payment"/>
+        android:text="@string/monthly_payment"
+        android:textColor="@color/textViewTextColor"/>
 
 </LinearLayout>

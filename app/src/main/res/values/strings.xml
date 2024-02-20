@@ -25,6 +25,7 @@
     <string name="sale_date">Sold Date</string>
 
     <string name="delete_real_estate">Delete</string>
+    <string name="permission_rationale_location">This application requires access to your location to display nearby real estate on the map. </string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

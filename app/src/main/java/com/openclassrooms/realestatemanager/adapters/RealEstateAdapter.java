@@ -34,7 +34,7 @@ public class RealEstateAdapter extends RecyclerView.Adapter<RealEstateViewHolder
 
     public interface OnItemClickListener {
         void onItemClick(RealEstate realEstate);
-        void onDeleteClick(RealEstate realEstate);
+
     }
 
     private OnItemClickListener listener;
@@ -63,7 +63,6 @@ public class RealEstateAdapter extends RecyclerView.Adapter<RealEstateViewHolder
         holder.getRealEstateRegion().setText(realEstateList.get(position).getRegion());
         holder.getRealEstatePrice().setText(mContext.getString(R.string.price,realEstateList.get(position).getPrice()));
 
-        holder.getDeleteButton().setOnClickListener(v -> listener.onDeleteClick(realEstateList.get(holder.getAdapterPosition())));
 
 
         holder.itemView.setSelected(selectedPosition == position);

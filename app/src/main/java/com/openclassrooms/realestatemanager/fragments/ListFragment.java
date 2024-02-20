@@ -197,11 +197,6 @@ public class ListFragment extends Fragment implements RealEstateAdapter.OnItemCl
         transaction.commit();
     }
 
-    @Override
-    public void onDeleteClick(RealEstate realEstate) {
-        realEstateViewModel.deleteRealEstate(realEstate); // Assurez-vous que cette méthode accepte un RealEstate comme paramètre
-        // Montrer un Toast ou une Snackbar pour confirmer la suppression
-    }
 
 
 }

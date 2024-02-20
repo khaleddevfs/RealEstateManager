@@ -42,9 +42,13 @@
         android:id="@+id/mediaViewPager"
         android:layout_width="match_parent"
         android:layout_height="200dp"
+        android:paddingLeft="0dp"
+        android:paddingRight="0dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/mediaTextView"
         app:layout_constraintBottom_toTopOf="@id/DescTitle"
+        android:clipToPadding="false"
+        android:clipChildren="false"
         android:orientation="horizontal"/>
 
 

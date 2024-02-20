@@ -15,5 +15,12 @@
 
     <style name="MyDialogTheme" parent="Theme.MaterialComponents.Light.Dialog"/>
 
+    <style name="Widget_Button_Colored" parent="Widget.AppCompat.Button">
+        <item name="android:textColor">@color/buttonTextColor</item>
+        <item name="android:background">@color/buttonBackgroundColor</item>
+        <!-- Add other style properties as needed -->
+    </style>
+
+
 
 </resources>

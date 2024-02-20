@@ -9,4 +9,11 @@
     <color name="colorLightGrey">#F6F6F6</color>
     <color name="colorYellow">#F8E71C</color>
     <color name="colorBlack">#000000</color>
+
+    <color name="editTextBackground">#FFFFFF</color>
+    <color name="editTextTextColor">#000000</color>
+    <color name="textViewTextColor">#333333</color>
+    <color name="buttonTextColor">#FFFFFF</color>
+    <color name="buttonBackgroundColor">#00796B</color>
+
 </resources>

@@ -219,21 +219,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
 
         return super.onCreateOptionsMenu(menu);
-    }
 
 
 
-
-
-/*
-    //----- Bottom Navigation -----
-
-    private void configureBottomView() {
-        if (binding.mainBottomNavigationView != null) {
-            binding.mainBottomNavigationView.setOnNavigationItemReselectedListener(item -> onBottomNavigation(item.getItemId()));
-        } else {
-            Log.e("MainActivity", "BottomNavigationView is null. Unable to set OnNavigationItemReselectedListener.");
-        }
     }
 
 
@@ -241,33 +229,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
 
-    public void onBottomNavigation(int itemId) {
-
-        Log.d("BottomNavigation", "onBottomNavigation called, itemId: " + itemId);
-
-        Fragment selectedFragment = null;
-
-        if (itemId == R.id.bottom_navigation_menu_home_button) {
-            selectedFragment = new ListFragment();
-        } else if (itemId == R.id.bottom_navigation_menu_map_button) {
-            selectedFragment = new MapFragment();
-        } else if (itemId == R.id.bottom_navigation_menu_add_button) {
-           // selectedFragment = new WorkmatesFragment();
-        }
-
-        if (selectedFragment != null) {
-
-            Log.d("BottomNavigation", "Replacing fragment with: " + selectedFragment.getClass().getSimpleName());
-
-            MainActivity.this
-                    .getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.main_frame_layout, selectedFragment)
-                    .commit();
-        }
-    }
-
- */
 
     private void configureNavigationView() {
         binding.navView.setNavigationItemSelectedListener(this);

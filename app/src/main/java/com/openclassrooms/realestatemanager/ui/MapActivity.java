@@ -72,11 +72,9 @@ public class MapActivity extends AppCompatActivity implements MapFragment.OnMark
 
         DetailsFragment detailFragment = DetailsFragment.newInstance(estate);
 
-        // Vérifiez si l'appareil est une tablette ou un téléphone
         boolean isTablet = getResources().getBoolean(R.bool.isTablet);
         Log.d("MapActivity", "Is tablet: " + isTablet);
 
-        // Choisissez le conteneur en fonction du type d'appareil
         int containerId = isTablet ? R.id.details_fragment_container : R.id.map_container; // Assurez-vous que c'est map_container ici
         Log.d("MapActivity", "Container ID: " + containerId);
 
@@ -86,7 +84,7 @@ public class MapActivity extends AppCompatActivity implements MapFragment.OnMark
         transaction.replace(containerId, detailFragment);
         if (!isTablet) {
             // Ajoutez la transaction à la pile arrière uniquement pour les téléphones
-            transaction.addToBackStack(null);
+          transaction.addToBackStack(null);
         }
         transaction.commit();
     }
