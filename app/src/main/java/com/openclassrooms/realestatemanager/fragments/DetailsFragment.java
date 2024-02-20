@@ -48,6 +48,7 @@ import com.openclassrooms.realestatemanager.models.RealEstate;
 import com.openclassrooms.realestatemanager.models.RealEstateMedia;
 import com.openclassrooms.realestatemanager.ui.ImagePopupWindow;
 import com.openclassrooms.realestatemanager.ui.SupportActivity;
+import com.openclassrooms.realestatemanager.utils.ImageLoader;
 import com.openclassrooms.realestatemanager.utils.SaveImageTask;
 import com.openclassrooms.realestatemanager.viewModel.RealEstateViewModel;
 
@@ -155,7 +156,7 @@ public class DetailsFragment extends Fragment implements OnMapCreated, OnItemCli
 
     private void updateUi() {
         updatePropertyDetails();
-
+/*
         if (estate != null && estate.getLatitude() != 0 && estate.getLongitude() != 0) {
             String mapImageUrl = generateMapImageUrl(estate.getLatitude(), estate.getLongitude());
             File mapImageFile = new File(getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), "map_image.png");
@@ -163,6 +164,30 @@ public class DetailsFragment extends Fragment implements OnMapCreated, OnItemCli
         } else {
             Log.e("DetailsFragment", "Coordonnées invalides ou objet estate non initialisé");
         }
+
+ */
+        if (estate != null && estate.getLatitude() != 0 && estate.getLongitude() != 0) {
+            String mapImageUrl = generateMapImageUrl(estate.getLatitude(), estate.getLongitude());
+            // Utilisez ImageLoader pour télécharger et afficher l'image
+            loadImage(mapImageUrl);
+        } else {
+            Log.e("DetailsFragment", "Coordonnées invalides ou objet estate non initialisé");
+        }
+    }
+
+    private void loadImage(String mapImageUrl) {
+        ImageLoader imageLoader = new ImageLoader();
+        imageLoader.loadImage(mapImageUrl, new ImageLoader.ImageLoadCallback() {
+            @Override
+            public void onImageLoaded(Drawable drawable) {
+                if (drawable != null) {
+                    // Assurez-vous de mettre à jour l'interface utilisateur sur le thread principal
+                    getActivity().runOnUiThread(() -> binding.staticMap.setImageDrawable(drawable));
+                } else {
+                    Log.e("DetailsFragment", "Impossible de charger l'image de la carte.");
+                }
+            }
+        });
     }
 
     private void setupMediaGalleryViewPager() {
