@@ -128,9 +128,20 @@ public class RealEstateViewModel extends ViewModel {
         });
     }
 
-    public void setRealEstateSoldStatus(long realEstateId, boolean isSold) {
-        executor.execute(() -> realEstateRepo.setRealEstateSoldStatus(realEstateId, isSold));
+    public void updateRealEstateSaleDate(long realEstateId, Date saleDate) {
+        executor.execute(() -> {
+            RealEstate realEstate = realEstateRepo.getRealEstateById(realEstateId).getValue();
+            if (realEstate != null) {
+                realEstate.setSaleDate(saleDate);
+                realEstate.setSold(true); // Mark the property as sold
+                realEstateRepo.createOrUpdateRealEstate(realEstate);
+                Log.d("RealEstateViewModel", "Updated sale date for RealEstate ID: " + realEstateId);
+                // Optionally post a value to a LiveData to notify observers of the update completion
+            } else {
+                Log.e("RealEstateViewModel", "RealEstate not found with ID: " + realEstateId);
+                // Handle the case where the RealEstate object was not found
+            }
+        });
     }
-
 
 }

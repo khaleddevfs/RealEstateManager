@@ -22,7 +22,8 @@
     <string name="edit_button">Edit</string>
     <string name="price">%d €</string>
     <string name="sold">Sold</string>
-    delete_real_estate
+    <string name="sale_date">Sold Date</string>
+
     <string name="delete_real_estate">Delete</string>
 
     <!-- TODO: Remove or change this placeholder text -->

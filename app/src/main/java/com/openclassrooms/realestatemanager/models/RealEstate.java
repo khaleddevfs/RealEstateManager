@@ -139,8 +139,8 @@ import java.util.Objects;
 @Entity
 public class RealEstate implements Parcelable {
 
-    private transient double latitude = Double.MIN_VALUE; // Utiliser transient pour exclure de Room
-    private transient double longitude = Double.MIN_VALUE;
+  //  private  double latitude = Double.MIN_VALUE; // Utiliser transient pour exclure de Room
+  //  private double longitude = Double.MIN_VALUE;
 
     @ColumnInfo(name = "listing_date")
     Date listingDate;
@@ -170,6 +170,16 @@ public class RealEstate implements Parcelable {
             bedrooms;
     @Ignore
     private List<RealEstateMedia> mediaList;
+
+    @ColumnInfo(name = "latitude")
+    private double latitude;
+
+    @ColumnInfo(name = "longitude")
+    private double longitude;
+
+    @ColumnInfo(name = "address")
+    private String address; // Nouveau champ pour l'adresse
+
 
     protected RealEstate(Parcel in) {
         id = in.readLong();
@@ -293,6 +303,26 @@ public class RealEstate implements Parcelable {
         }
     }
 
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    /**
+     * Définit la longitude de l'immobilier.
+     * @param longitude La nouvelle longitude.
+     */
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
 
 
 
@@ -310,8 +340,6 @@ public class RealEstate implements Parcelable {
         }
         return longitude;
     }
-
-
 
 
     public Boolean getSync() {

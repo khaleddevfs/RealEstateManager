@@ -31,6 +31,9 @@ public interface RealEstateDao {
     @Query("SELECT * FROM RealEstate WHERE id = :id")
     Cursor getRealEstateWithCursor(long id);
 
+    @Query("SELECT * FROM RealEstate WHERE id = :id")
+    LiveData<RealEstate> getRealEstateById(long id);
+
     @Query("SELECT * FROM RealEstate WHERE (:name IS NULL OR name LIKE '%' || :name || '%') " +
             "AND (:maxPrice IS NULL OR price <= :maxPrice) " +
             "AND (:minPrice IS NULL OR price >= :minPrice) " +

@@ -1,6 +1,8 @@
 package com.openclassrooms.realestatemanager.fragments;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -14,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -23,6 +26,7 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import com.openclassrooms.realestatemanager.R;
@@ -37,6 +41,13 @@ import pub.devrel.easypermissions.EasyPermissions;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback, EasyPermissions.PermissionCallbacks {
 
+
+    // Interface de callback pour le clic sur un marqueur
+    public interface OnMarkerClickListener {
+        void onMarkerClick(RealEstate estate);
+    }
+
+    private OnMarkerClickListener callback;
     private static final String ESTATE_KEY = "ESTATE";
     private static final String ESTATES_KEY = "ESTATES";
     private static final float DEFAULT_ZOOM_LEVEL = 14.0f;
@@ -107,16 +118,65 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, EasyPer
         }
 
 
+    @SuppressLint("PotentialBehaviorOverride")
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         this.googleMap = googleMap;
 
         if (checkLocationPermissions()) {
-            getCurrentLocation(); // Méthode pour obtenir la localisation actuelle de l'utilisateur
+            getCurrentLocation(); // Continuer à obtenir la position actuelle de l'utilisateur si nécessaire
         }
-        Log.d("lodi", "onMapReady"  );
 
+/*
+        googleMap.setOnMarkerClickListener(marker -> {
+            RealEstate clickedEstate = (RealEstate) marker.getTag(); // Assuming you set the estate as tag
+            if (clickedEstate != null) {
+                goToDetailsFragment(clickedEstate);
+            }
+            return false; // Returning false to indicate that we have not consumed the event and that we wish for the default behavior to occur (which is for the camera to move such that the marker is centered and for the marker's info window to be opened).
+        });
+
+ */
+
+
+
+
+        setupMarkers(); // Assurez-vous que cette ligne est appelée pour configurer les marqueurs
+
+
+
+        // Configurez ici l'écouteur de clic sur les marqueurs
+        this.googleMap.setOnMarkerClickListener(marker -> {
+            handleMarkerClick(marker); // Appelez votre méthode handleMarkerClick
+            return true; // Retournez true pour indiquer que nous avons géré l'événement de clic
+        });
     }
+
+
+
+
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof OnMarkerClickListener) {
+            callback = (OnMarkerClickListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnMarkerClickListener");
+        }
+    }
+
+    // Méthode pour gérer le clic sur le marqueur dans votre MapFragment
+    private void handleMarkerClick(Marker marker) {
+        RealEstate estate = (RealEstate) marker.getTag();
+        if (estate != null && callback != null) {
+            callback.onMarkerClick(estate);
+        }
+    }
+
+    // Assurez-vous d'appeler handleMarkerClick(marker) lorsque l'utilisateur clique sur un marqueur
+
     private boolean checkLocationPermissions() {
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -150,59 +210,63 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, EasyPer
             Log.e("MapFragment", "Erreur de sécurité en récupérant la localisation : ", e);
         }
     }
-    public void updateRealEstateData(RealEstate newEstate) {
-        this.estate = newEstate; // Mise à jour de la propriété avec les nouvelles données
-        if (googleMap != null) {
-            googleMap.clear(); // Effacez tous les marqueurs existants sur la carte
-            setupMarkers(); // Ajoutez de nouveau les marqueurs avec les données mises à jour
-        }
-    }
 
 
 
 
     private void setupMarkers() {
-        if (estate != null) {
-            // Ajoutez un marqueur pour l'immobilier unique
-            addMarker(estate);
-        } else if (realEstateList != null) {
-            // Ajoutez des marqueurs pour chaque immobilier dans la liste
+        if (realEstateList != null && !realEstateList.isEmpty()) {
             for (RealEstate estate : realEstateList) {
                 addMarker(estate);
             }
         }
     }
 
-    /*private void addMarker(RealEstate estate) {
-        // Vous devez définir getLatitude() et getLongitude() dans votre modèle RealEstate
-        LatLng position = new LatLng(estate.getLatitude(), estate.getLongitude());
-        googleMap.addMarker(new MarkerOptions().position(position).title(estate.getName()));
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position, DEFAULT_ZOOM_LEVEL));
-        Log.d("lodi", "AddMarker"  );
-    }
-
-     */
     private void addMarker(RealEstate estate) {
-        // Créez une instance de Geocoder
-        Geocoder geocoder = new Geocoder(getContext());
-        List<Address> addresses;
-        try {
-            // Effectuez le géocodage de l'adresse. Remplacez "estate.getAddress()" par votre méthode d'obtention de l'adresse
-            addresses = geocoder.getFromLocationName(estate.getLocation(), 1);
-            if (addresses != null && !addresses.isEmpty()) {
-                Address address = addresses.get(0);
-                // Utilisez les coordonnées de l'adresse pour créer un LatLng
-                LatLng position = new LatLng(address.getLatitude(), address.getLongitude());
-                googleMap.addMarker(new MarkerOptions().position(position).title(estate.getName()));
-                if (estate == this.estate) {
-                    // Si c'est l'immobilier en question, centrez la caméra sur ce marqueur
-                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position, DEFAULT_ZOOM_LEVEL));
-                }
-            }
-        } catch (IOException e) {
-            Log.e("MapFragment", "Erreur de géocodage : ", e);
+        LatLng position = new LatLng(estate.getLatitude(), estate.getLongitude());
+        MarkerOptions markerOptions = new MarkerOptions().position(position).title(estate.getName());
+        Marker marker = googleMap.addMarker(markerOptions);
+        if (marker != null) {
+            marker.setTag(estate); // Store the estate object as a tag
         }
     }
+
+
+
+
+
+   /* private void goToDetailsFragment(RealEstate estate) {
+        Log.d("MapFragment", "Attempting to go to details fragment for: " + estate.getName());
+
+        // Assurez-vous que le fragment est attaché à une activité avant de continuer
+        if (!isAdded()) {
+            Log.e("MapFragment", "Fragment not attached to an activity.");
+            return;
+        }
+
+        DetailsFragment detailFragment = DetailsFragment.newInstance(estate);
+
+        boolean isTablet = getResources().getBoolean(R.bool.isTablet);
+        Log.d("MapFragment", "Is tablet: " + isTablet);
+
+        int containerId = isTablet ? R.id.details_fragment_container : R.id.main_frame_layout;
+        Log.d("MapFragment", "Container ID: " + containerId);
+
+        FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+
+        View container = getView().findViewById(containerId);
+        if (container != null) {
+            transaction.replace(containerId, detailFragment);
+            if (!isTablet) {
+                transaction.addToBackStack(null);
+            }
+            transaction.commit();
+        } else {
+            Log.e("MapFragment", "No view found for ID: " + containerId);
+        }
+    }
+
+    */
 
     @Override
     public void onPermissionsGranted(int requestCode, @NonNull List<String> perms) {

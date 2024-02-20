@@ -48,6 +48,10 @@ public class RealEstateRepo {
         return realEstateDao.filterRealEstates(name, maxSaleDate, minListingDate, maxPrice, minPrice, maxSurface, minSurface);
     }
 
+    public LiveData<RealEstate> getRealEstateById(long id) {
+        return realEstateDao.getRealEstateById(id);
+    }
+
     /**
      * Update the featured media URL of a real estate.
      */
