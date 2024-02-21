@@ -80,7 +80,7 @@ public class RealEstateEditor extends AppCompatActivity {
     private final ActivityResultLauncher<Intent> takePictureLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::handleTakePictureResult);
 
     private AlertDialog.Builder photoOrGalleryDialogBuilder;
-    // Global variables to hold the selected location data
+
     private Double selectedLatitude = null;
     private Double selectedLongitude = null;
     private String selectedAddress = null;
@@ -124,43 +124,6 @@ public class RealEstateEditor extends AppCompatActivity {
             Log.d("lodi", "No RealEstate data received");
         }
     }
-    /*
-    private void initializePlaces() {
-        // Initialisation du SDK Places
-        if (!Places.isInitialized()) {
-            Places.initialize(getApplicationContext(), getString(R.string.MAPS_API_KEY));
-        }
-
-        // Création d'une instance de l'AutocompleteSupportFragment
-        AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
-                getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
-
-        // Configuration des types de lieux à rechercher
-        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG, Place.Field.ADDRESS));
-
-        // Écouteur pour la sélection d'un lieu
-        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
-            @Override
-            public void onPlaceSelected(@NonNull Place place) {
-                Log.i("lodi", "Place: " + place.getName() + ", " + place.getLatLng());
-                // Assurez-vous que l'objet realEstate est initialisé (soit un nouveau, soit récupéré pour la mise à jour)
-                if (realEstate == null) {
-                    realEstate = new RealEstate(); // Seulement si vous créez un nouvel objet, sinon récupérez l'existant
-                }
-               realEstate.setLatitude(place.getLatLng().latitude);
-              realEstate.setLongitude(place.getLatLng().longitude);
-                realEstate.setAddress(place.getAddress()); // Mettez à jour l'adresse
-                // Ne pas oublier de persister les changements dans la base de données
-            }
-
-            @Override
-            public void onError(@NonNull Status status) {
-                Log.i("lodi", "An error occurred: " + status);
-            }
-        });
-    }
-
-     */
 
 
     private void initializePlaces() {
@@ -420,7 +383,7 @@ public class RealEstateEditor extends AppCompatActivity {
         intent.setType("image/*");
         pickImagesLauncher.launch(Intent.createChooser(intent, "Select Images"));
     }
-
+/*
     // Méthodes de gestion des permissions...
     private void checkPermissions() {
         String[] permissions;
@@ -449,6 +412,40 @@ public class RealEstateEditor extends AppCompatActivity {
 
         if (shouldRequestPermission) {
             ActivityCompat.requestPermissions(this, permissions, REQUEST_PERMISSION_CODE);
+        }
+    }
+
+ */
+
+    private void checkPermissions() {
+        String[] permissions;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissions = new String[]{
+                    android.Manifest.permission.CAMERA,
+                    android.Manifest.permission.READ_EXTERNAL_STORAGE,
+                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    android.Manifest.permission.READ_MEDIA_IMAGES
+            };
+        } else {
+            permissions = new String[]{
+                    android.Manifest.permission.CAMERA,
+                    android.Manifest.permission.READ_EXTERNAL_STORAGE,
+                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+            };
+        }
+
+        List<String> permissionsToRequest = new ArrayList<>();
+        for (String permission : permissions) {
+            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                permissionsToRequest.add(permission);
+            }
+        }
+
+        if (!permissionsToRequest.isEmpty()) {
+            ActivityCompat.requestPermissions(this, permissionsToRequest.toArray(new String[0]), REQUEST_PERMISSION_CODE);
+        } else {
+            // Toutes les permissions sont déjà accordées, procédez à l'action directement
+            photoOrGalleryDialog();
         }
     }
 

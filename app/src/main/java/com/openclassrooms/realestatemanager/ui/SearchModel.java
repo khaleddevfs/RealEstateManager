@@ -37,17 +37,23 @@ public class SearchModel extends DialogFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setStyle(DialogFragment.STYLE_NORMAL, R.style.MyDialogTheme);
+        Log.d("SearchModel", "onCreate: Dialog created");
+
     }
 
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+        Log.d("SearchModel", "onCreateDialog: Creating search dialog");
+
         AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity(), R.style.Theme_AppCompat_Light_Dialog_Alert);
         builder.setView(createDialogView());
         return builder.create();
     }
 
     private ScrollView createDialogView() {
+        Log.d("SearchModel", "createDialogView: Creating dialog view");
+
         LinearLayout dialogView = new LinearLayout(getActivity());
         dialogView.setOrientation(LinearLayout.VERTICAL);
         dialogView.setPadding(16, 16, 16, 16);
@@ -62,6 +68,8 @@ public class SearchModel extends DialogFragment {
     }
 
     private void initializeComponents(LinearLayout dialogView) {
+        Log.d("SearchModel", "initializeComponents: Initializing components for search dialog");
+
         estateNameSearchEditText = addEditText(dialogView, R.string.search_name_hint, InputType.TYPE_CLASS_TEXT, R.string.estate_name_search_text_view);
         surfaceSeekBar = addRangeSeekBar(dialogView, 0, 300, R.string.choose_the_surface_range_m);
         priceSeekBar = addRangeSeekBar(dialogView, 0, 10000000, R.string.choose_the_price_range);
@@ -135,6 +143,9 @@ public class SearchModel extends DialogFragment {
 
 
     private void performSearch(String name,int minSurface, int maxSurface, int minPrice, int maxPrice, int listedWeeks, int soldWeeks) {
+
+        Log.d("SearchModel", "performSearch: Performing search with parameters - Name: " + name + ", Surface: " + minSurface + "-" + maxSurface + ", Price: " + minPrice + "-" + maxPrice + ", Listed Weeks: " + listedWeeks + ", Sold Weeks: " + soldWeeks);
+
         RealEstateViewModel mRealEstateViewModel = new ViewModelProvider(this, ViewModelFactory.getInstance(requireContext())).get(RealEstateViewModel.class);
 
         Calendar calendar = Calendar.getInstance(), calendar1 = Calendar.getInstance();
@@ -149,15 +160,19 @@ public class SearchModel extends DialogFragment {
             minListingDate = calendar1.getTime();
 
         mRealEstateViewModel.filterEstates(name,maxSaleDate,minListingDate,maxPrice,minPrice,maxSurface,minSurface).observe(this, realEstates -> {
+            Log.d("SearchModel", "performSearch: Found " + realEstates.size() + " estates matching criteria");
+
             Intent intent = new Intent(requireContext(), MainActivity.class);
 
-            Log.d("TAG", "performSearch: " + realEstates );
+            Log.d("SearchModel", "performSearch: " + realEstates );
             intent.putParcelableArrayListExtra("filteredEstates",toParcelableList(realEstates));
-            Log.d("TAG", "performSearch: FILTER ");
+            Log.d("SearchModel", "performSearch: FILTER ");
             startActivity(intent);
         });
     }
     private ArrayList<Parcelable> toParcelableList(List<RealEstate> realEstates) {
+        Log.d("SearchModel", "toParcelableList: Converting list to Parcelable list");
+
         return new ArrayList<>(realEstates);
     }
 

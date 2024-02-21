@@ -176,6 +176,18 @@ public class ListFragment extends Fragment implements RealEstateAdapter.OnItemCl
 
     }
 
+    // Méthode pour mettre à jour la liste des biens immobiliers
+    public void updateRealEstateList(List<RealEstate> filteredEstates) {
+        Log.d(TAG, "updateRealEstateList: Updating real estate list in ListFragment");
+        if (adapter != null && filteredEstates != null) {
+            realEstateList.clear();
+            realEstateList.addAll(filteredEstates);
+            adapter.notifyDataSetChanged();
+        } else {
+            Log.e(TAG, "updateRealEstateList: Adapter is null or newList is null");
+        }
+    }
+
     @Override
     public void onItemClick(RealEstate realEstate) {
         Log.d(TAG, "onItemClick: Clicked on a real estate item");

@@ -20,7 +20,7 @@ public class RealEstateRepo {
 
     public RealEstateRepo(RealEstateDao realEstateDao) {
         this.realEstateDao = realEstateDao;
-        this.executor = Executors.newSingleThreadExecutor(); // Créez un Executor pour les opérations asynchrones
+        this.executor = Executors.newSingleThreadExecutor();
     }
 
     /**
@@ -33,13 +33,11 @@ public class RealEstateRepo {
     /**
      * Create or update a real estate.
      */
-    public long createOrUpdateRealEstate(RealEstate estate) {
-        return realEstateDao.createOrUpdateRealEstate(estate);
+    public long createOrUpdateRealEstate(RealEstate realEstate) {
+        return realEstateDao.createOrUpdateRealEstate(realEstate);
     }
 
-    public void deleteRealEstate(RealEstate estate) {
-        realEstateDao.deleteRealEstate(estate);
-    }
+
 
     /**
      * Filter real estates based on various criteria.

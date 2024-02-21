@@ -72,26 +72,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
 
-    private final ActivityResultLauncher<Intent> editRealEstateLauncher =
-            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
-                    result -> {
-                        if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
-                            RealEstate editedEstate = result.getData().getParcelableExtra("EDITED_REAL_ESTATE");
-
-                            // Mettre à jour ou ajouter de nouveaux médias
-                            viewModel.addNewMedia(editedEstate, editedEstate.getID());
-
-                            Log.d("lodi", "editRealEstateLauncher");
-
-                            updateLocalRealEstateList(editedEstate);
-                        }
-                        showRealEstateCreatedNotification();
-                    });
-
-
-
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,10 +81,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         configureUI();
         SyncDB();
         createNotificationChannel();
-
-
-
-
 
         // Déterminer si l'appareil est une tablette
         isTwoPaneLayout = getResources().getBoolean(R.bool.isTablet);
@@ -118,10 +94,79 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
 
+        handleIntent(getIntent());
+
+    }
+
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        // Gérer les différents types d'intents
+        if (intent.hasExtra("ACTION")) {
+            handleIntent(intent);
+        } else if (intent.hasExtra("filteredEstates")) {
+            handleSearchIntent(intent);
+        }
+
+
+        }
+
+
+
+
+    private void handleIntent(Intent intent) {
+      // Vérifiez s'il y a des instructions spécifiques
+        if ("SHOW_DETAILS".equals(intent.getStringExtra("ACTION"))) {
+            RealEstate realEstate = intent.getParcelableExtra("REAL_ESTATE");
+            if (realEstate != null) {
+                // Procédez à afficher DetailsFragment
+                showDetailsFragment(realEstate);
+            }
+        }
+
+
+
 
 
     }
 
+    private void handleSearchIntent(Intent intent) {
+        if (intent.hasExtra("filteredEstates")) {
+            ArrayList<RealEstate> filteredEstates = intent.getParcelableArrayListExtra("filteredEstates");
+            Log.d("MainActivity", "Received " + filteredEstates.size() + " filtered estates");
+            displayFilteredEstates(filteredEstates);
+        }
+
+
+
+    }
+
+
+    private void displayFilteredEstates(ArrayList<RealEstate> filteredEstates) {
+        Log.d("MainActivity", "displayFilteredEstates: Displaying filtered estates");
+
+        if (isTwoPaneLayout) {
+            // Tablet layout
+            ListFragment listFragment = (ListFragment) getSupportFragmentManager().findFragmentById(R.id.list_fragment_container);
+            if (listFragment != null) {
+                listFragment.updateRealEstateList(filteredEstates);
+            } else {
+                Log.e("MainActivity", "ListFragment is not found in the tablet layout.");
+            }
+        } else {
+            // Phone layout
+            ListFragment listFragment = ListFragment.newInstance();
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.main_frame_layout, listFragment)
+                    .commitNow(); // Use commitNow to immediately execute the transaction
+
+            // Since the fragment might not be fully initialized yet, post a runnable to the fragment's view
+            // to ensure updateRealEstateList is called after the fragment is attached and view is created
+            listFragment.getView().post(() -> listFragment.updateRealEstateList(filteredEstates));
+        }
+    }
 
 
 
@@ -142,7 +187,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .commit();
     }
 
+    private void showDetailsFragment(RealEstate realEstate) {
+        DetailsFragment detailsFragment = DetailsFragment.newInstance(realEstate);
+        int containerId = isTwoPaneLayout ? R.id.details_fragment_container : R.id.main_frame_layout;
 
+        getSupportFragmentManager().beginTransaction()
+                .replace(containerId, detailsFragment)
+                .addToBackStack(null) // Vous pouvez omettre ceci pour les tablettes si vous ne voulez pas de pile arrière
+                .commit();
+    }
 
     private void createNewRealEstate() {
         Intent intent = new Intent(this, RealEstateEditor.class);
@@ -151,7 +204,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Log.d("lodi", "createNewRealEstate");
     }
 
+    private final ActivityResultLauncher<Intent> editRealEstateLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                    result -> {
+                        if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                            RealEstate editedEstate = result.getData().getParcelableExtra("EDITED_REAL_ESTATE");
 
+                            // Mettre à jour ou ajouter de nouveaux médias
+                            viewModel.addNewMedia(editedEstate, editedEstate.getID());
+
+                            Log.d("lodi", "editRealEstateLauncher");
+
+                            updateLocalRealEstateList(editedEstate);
+                        }
+                        showRealEstateCreatedNotification();
+                    });
     private void initView() {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
@@ -319,21 +386,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             int totalEstates = realEstateList.size();
             int currentEstateIndex = 0;
 
-            for (RealEstate estate : realEstateList) {
-                if (!estate.getSync()) {
+            for (RealEstate realEstate : realEstateList) {
+                if (!realEstate.getSync()) {
                     try {
                         // Créer ou mettre à jour le bien immobilier
-                        long result = realEstateDao.createOrUpdateRealEstate(estate);
+                        long result = realEstateDao.createOrUpdateRealEstate(realEstate);
 
                         // Si result est > 0, la sauvegarde ou mise à jour a réussi
                         if (result > 0) {
-                            estate.setSync(true);
+                            realEstate.setSync(true);
                         } else {
-                            estate.setSync(false);
+                            realEstate.setSync(false);
                         }
 
                     } catch (Exception e) {
-                        estate.setSync(false);
+                        realEstate.setSync(false);
                     }
 
                     currentEstateIndex++;

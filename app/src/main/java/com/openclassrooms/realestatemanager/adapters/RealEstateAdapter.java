@@ -79,13 +79,12 @@ public class RealEstateAdapter extends RecyclerView.Adapter<RealEstateViewHolder
         });
 
         if (realEstate.isSold()) {
-            holder.setSold(true); // Cette méthode ajustera la visibilité du badge "Vendu" selon l'état
+            holder.setSold(true);
         } else {
             holder.setSold(false);
         }
 
-        // Gestion du badge "Vendu"
-       // holder.setSold(realEstate.isSold()); // Utilisation correcte de la méthode setSold
+
     }
 
 

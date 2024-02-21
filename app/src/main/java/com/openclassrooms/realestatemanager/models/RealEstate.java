@@ -150,7 +150,7 @@ public class RealEstate implements Parcelable {
     private long id;
 
     @ColumnInfo(name = "is_sold")
-    private boolean isSold; // Champ pour stocker l'état de vente
+    private boolean isSold;
     private String name;
 
     private String jsonPoint;
@@ -178,7 +178,7 @@ public class RealEstate implements Parcelable {
     private double longitude;
 
     @ColumnInfo(name = "address")
-    private String address; // Nouveau champ pour l'adresse
+    private String address;
 
 
     protected RealEstate(Parcel in) {
@@ -298,7 +298,7 @@ public class RealEstate implements Parcelable {
             longitude = jsonObject.optDouble("longitude", 0.0);
         } catch (JSONException e) {
             Log.e("RealEstate", "Erreur lors de l'analyse de jsonPoint", e);
-            latitude = 0.0; // Assigner une valeur par défaut en cas d'erreur
+            latitude = 0.0;
             longitude = 0.0;
         }
     }
@@ -307,10 +307,7 @@ public class RealEstate implements Parcelable {
         this.latitude = latitude;
     }
 
-    /**
-     * Définit la longitude de l'immobilier.
-     * @param longitude La nouvelle longitude.
-     */
+
     public void setLongitude(double longitude) {
         this.longitude = longitude;
     }
@@ -329,14 +326,14 @@ public class RealEstate implements Parcelable {
     // Utiliser les valeurs stockées pour la latitude et la longitude
     public double getLatitude() {
         if (latitude == Double.MIN_VALUE) {
-            parseJsonPoint(); // Assurer une analyse en cas d'accès direct sans passer par setJsonPoint
+            parseJsonPoint();
         }
         return latitude;
     }
 
     public double getLongitude() {
         if (longitude == Double.MIN_VALUE) {
-            parseJsonPoint(); // Assurer une analyse en cas d'accès direct sans passer par setJsonPoint
+            parseJsonPoint();
         }
         return longitude;
     }
@@ -347,7 +344,7 @@ public class RealEstate implements Parcelable {
     }
 
     public void setSync(Boolean sync) {
-        isSync = sync;
+       this.isSync = sync;
     }
 
     public void setListingDate(Date listingDate) {

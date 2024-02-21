@@ -35,12 +35,12 @@ public class RealEstateEditorRvAdapter extends RecyclerView.Adapter<RealEstateEd
         RealEstateMedia media = realEstateMediaList.get(position);
         if (media != null) {
             Glide.with(holder.itemView.getContext())
-                    .load(new File(media.getMediaUrl())) // Assurez-vous que le chemin est correct et accessible
+                    .load(new File(media.getMediaUrl()))
                     .into(holder.getImage());
             holder.getCaption().setText(media.getMediaCaption());
 
             holder.getButton().setOnClickListener(view -> {
-                // Suppression de l'élément et notification de l'adaptateur
+
                 realEstateMediaList.remove(position);
                 notifyItemRemoved(position);
                 notifyItemRangeChanged(position, realEstateMediaList.size());
@@ -58,7 +58,7 @@ public class RealEstateEditorRvAdapter extends RecyclerView.Adapter<RealEstateEd
 
     public void setRealEstateMediaList(List<RealEstateMedia> realEstateMediaList) {
         this.realEstateMediaList = realEstateMediaList;
-        notifyDataSetChanged(); // Rafraîchit la vue avec la nouvelle liste
+        notifyDataSetChanged();
     }
 }
 

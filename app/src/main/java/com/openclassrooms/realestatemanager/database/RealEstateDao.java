@@ -47,12 +47,7 @@ public interface RealEstateDao {
     @Query("UPDATE RealEstate SET featuredMediaUrl = :featuredMediaUrl WHERE id = :realEstateId")
     void updateFeaturedMediaUrl(long realEstateId, String featuredMediaUrl);
 
-    /**
-     * Mise à jour du statut de vente d'un bien immobilier.
-     *
-     * @param realEstateId L'identifiant du bien immobilier.
-     * @param isSold Le nouveau statut de vente (true pour vendu, false sinon).
-     */
+
     @Query("UPDATE RealEstate SET is_sold = :isSold WHERE id = :realEstateId")
     void setRealEstateSoldStatus(long realEstateId, boolean isSold);
 

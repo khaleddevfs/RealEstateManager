@@ -44,17 +44,6 @@ public class RealEstateViewModel extends ViewModel {
         return saveOperationComplete;
     }
 
-   /* public void createOrUpdateRealEstate(RealEstate estate) {
-        executor.execute(() -> {
-            long id = realEstateRepo.createOrUpdateRealEstate(estate);
-            Log.d("TAG", "createOrUpdateRealEstate: ID: " + estate.getID() + ", New ID: " + id);
-
-            deleteAssociatedMedia(id);
-            addNewMedia(estate, id);
-        });
-    }
-
-    */
 
 
     public void createOrUpdateRealEstate(RealEstate estate) {

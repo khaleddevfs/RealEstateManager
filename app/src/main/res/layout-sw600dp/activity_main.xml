@@ -48,16 +48,6 @@
         android:layout_gravity="start"
         app:menu="@menu/drawer_menu" />
 
-    <!-- Bouton FAB pour ajouter un nouveau Real Estate -->
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_add_real_estate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        android:src="@drawable/baseline_add_24"
-        android:contentDescription="TODO"
-        app:layout_anchor="@id/main_frame_layout"
-        app:layout_anchorGravity="bottom|end|right" />
+
 
 </androidx.drawerlayout.widget.DrawerLayout>

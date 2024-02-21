@@ -19,10 +19,7 @@ public class RealEstateViewHolder extends RecyclerView.ViewHolder{
 
     public RealEstateViewHolder(RealEstateListItemBinding binding) {
         super(binding.getRoot());
-        this.binding = binding;
-      //  binding.getRoot();
-
-            }
+        this.binding = binding;}
 
 
     public ImageView getRealEstateImageView()

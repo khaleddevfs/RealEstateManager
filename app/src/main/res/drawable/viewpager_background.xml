@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@android:color/white"/> <!-- Choisissez votre couleur de fond -->
+    <corners android:radius="16dp"/> <!-- Ajustez le rayon pour les coins arrondis -->
+    <!-- Pour l'ombre, vous devrez gérer cela via l'élevation dans votre ViewPager2 ou en utilisant une CardView comme conteneur parent pour le ViewPager2 -->
+</shape>

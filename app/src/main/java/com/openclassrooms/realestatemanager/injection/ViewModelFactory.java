@@ -47,8 +47,7 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
     @Override
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
         if (modelClass.isAssignableFrom(RealEstateViewModel.class)) {
-            // Cast directement vers le type T pour éviter les problèmes de type
-           // return (T) new RealEstateViewModel(realEstateRepo, realEstateMediaRepo, executor);
+
             return Objects.requireNonNull(modelClass.cast(new RealEstateViewModel(realEstateRepo, realEstateMediaRepo, executor)));
 
         }

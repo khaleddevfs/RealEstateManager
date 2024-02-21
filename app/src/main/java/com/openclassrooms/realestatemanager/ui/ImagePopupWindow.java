@@ -20,7 +20,7 @@ public class ImagePopupWindow {
         PopupImageBinding binding = PopupImageBinding.inflate(LayoutInflater.from(anchorView.getContext()), (ViewGroup) anchorView.getParent(), false);
 
         // Création du PopupWindow avec le root du binding comme vue.
-        PopupWindow popupWindow = new PopupWindow(binding.getRoot(), ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
+        PopupWindow popupWindow = new PopupWindow(binding.getRoot(), ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, true);
         popupWindow.setOutsideTouchable(true);
         popupWindow.setFocusable(true);
         popupWindow.showAtLocation(anchorView, Gravity.CENTER, 0, 0);
