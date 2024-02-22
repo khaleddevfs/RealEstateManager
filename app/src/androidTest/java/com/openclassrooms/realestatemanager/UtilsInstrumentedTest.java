@@ -37,7 +37,7 @@ public class UtilsInstrumentedTest {
 
     @Test
     public void getTodayDate() {
-        assertEquals("20/02/2024",Utils.getTodayDate());
+        assertEquals("22/02/2024",Utils.getTodayDate());
     }
 
 }

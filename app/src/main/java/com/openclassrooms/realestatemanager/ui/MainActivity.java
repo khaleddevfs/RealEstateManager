@@ -211,7 +211,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             RealEstate editedEstate = result.getData().getParcelableExtra("EDITED_REAL_ESTATE");
 
                             // Mettre à jour ou ajouter de nouveaux médias
-                            viewModel.addNewMedia(editedEstate, editedEstate.getID());
+                            viewModel.addNewMedia(editedEstate, editedEstate.getId());
 
                             Log.d("lodi", "editRealEstateLauncher");
 
@@ -369,7 +369,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         private void updateLocalRealEstateList (RealEstate editedEstate){
             for (int i = 0; i < realEstateList.size(); i++) {
-                if (realEstateList.get(i).getID() == editedEstate.getID()) {
+                if (realEstateList.get(i).getId() == editedEstate.getId()) {
                     realEstateList.set(i, editedEstate);
                     break;
                 }

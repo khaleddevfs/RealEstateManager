@@ -159,7 +159,7 @@ public class RealEstateDaoTest extends TestCase {
 
     public void testDeleteRealEstate() throws Throwable {
         RealEstate mockRealEstate = new RealEstate();
-        mockRealEstate.setID(1L);
+        mockRealEstate.setId(1L);
 
         dao.deleteRealEstate(mockRealEstate);
 
@@ -183,8 +183,8 @@ public class RealEstateDaoTest extends TestCase {
 
         runOnUiThread(() -> dao.getAllRealEstate().observe(lifecycleOwner, realEstates -> {
             assertEquals(5,realEstates.size());
-            Cursor res = dao.getRealEstateWithCursor(realEstates.get(0).getID());
-            assertEquals(realEstates.get(0).getID(),res.getLong(res.getColumnIndex("mID")));
+            Cursor res = dao.getRealEstateWithCursor(realEstates.get(0).getId());
+            assertEquals(realEstates.get(0).getId(),res.getLong(res.getColumnIndex("mID")));
         }));
 
 

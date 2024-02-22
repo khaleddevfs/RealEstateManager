@@ -97,14 +97,14 @@ public class RealEstateTest extends TestCase {
 
     public void testGetID() {
         RealEstate estate = new RealEstate();
-        estate.setID(10000L);
-        assertEquals(10000L,estate.getID());
+        estate.setId(10000L);
+        assertEquals(10000L,estate.getId());
     }
 
     public void testSetID() {
         RealEstate estate = new RealEstate();
-        estate.setID(10000L);
-        assertEquals(10000L,estate.getID());
+        estate.setId(10000L);
+        assertEquals(10000L,estate.getId());
     }
 
     public void testGetLocation() {
@@ -268,8 +268,8 @@ public class RealEstateTest extends TestCase {
     public void testTestEquals() {
         RealEstate estate1 = new RealEstate();
         RealEstate estate2 = new RealEstate();
-        estate1.setID(1);
-        estate2.setID(1);
+        estate1.setId(1);
+        estate2.setId(1);
         assertEquals(estate1,estate2);
     }
 
@@ -320,7 +320,7 @@ public class RealEstateTest extends TestCase {
         values.put("sale_date", new Date().getTime());
 
         RealEstate expectedRealEstate = new RealEstate();
-        expectedRealEstate.setID(12345L);
+        expectedRealEstate.setId(12345L);
         expectedRealEstate.setName("Beautiful House");
         expectedRealEstate.setJsonPoint("{latitude: 123, longitude: 456}");
         expectedRealEstate.setRegion("City");

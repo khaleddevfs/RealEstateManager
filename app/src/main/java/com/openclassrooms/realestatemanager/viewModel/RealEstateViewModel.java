@@ -45,44 +45,70 @@ public class RealEstateViewModel extends ViewModel {
     }
 
 
-
-    public void createOrUpdateRealEstate(RealEstate estate) {
-        executor.execute(() -> {
-            long id = realEstateRepo.createOrUpdateRealEstate(estate);
-            Log.d("RealEstateViewModel", "createOrUpdateRealEstate: ID: " + estate.getID() + ", New ID: " + id);
-
-            if (id > 0) {
-                estate.setID(id); // Mettez à jour l'ID de l'entité estate avec le nouvel ID
-                deleteAssociatedMedia(id);
-
-                if (estate.getMediaList() != null && !estate.getMediaList().isEmpty()) {
-                    for (RealEstateMedia media : estate.getMediaList()) {
-                        media.setRealEstateId(id); // Assurez-vous que l'ID de l'immobilier est correctement défini
-                        executor.execute(() -> realEstateMediaRepo.addRealEstateMedia(media));
-                    }
-                    // Notifiez ici que l'opération de sauvegarde est complète
-                    // Note: Cette notification est déclenchée de manière asynchrone
-                    saveOperationComplete.postValue(true);
-                } else {
-                    // Si il n'y a pas de médias à ajouter, notifiez immédiatement que l'opération est terminée
-                    saveOperationComplete.postValue(true);
-                }
-            } else {
-                Log.e("RealEstateViewModel", "Failed to create or update RealEstate with ID: " + estate.getID());
-                // Vous pouvez choisir de notifier un échec ici si nécessaire
-                // saveOperationComplete.postValue(false);
-            }
-        });    }
-
-
-
-    public void deleteAssociatedMedia(long realEstateId) {
-        executor.execute(() -> realEstateMediaRepo.deleteAllMediaByRealEstateID(realEstateId));
+private boolean validateRealEstateData(RealEstate realEstate) {
+    if (realEstate == null) {
+        Log.e("RealEstateViewModel", "L'objet RealEstate est null.");
+        return false;
     }
 
-   public void addNewMedia(RealEstate estate, long realEstateId) {
-        if (estate.getMediaList() != null) {
-            estate.getMediaList().forEach(media -> {
+    // Vérifiez que les champs requis ne sont pas vides ou null.
+    if (realEstate.getName() == null || realEstate.getName().trim().isEmpty()) {
+        Log.e("RealEstateViewModel", "Le nom du bien immobilier est requis.");
+        return false;
+    }
+
+    if (realEstate.getPrice() <= 0) {
+        Log.e("RealEstateViewModel", "Le prix du bien immobilier doit être supérieur à 0.");
+        return false;
+    }
+
+    // Vérifiez d'autres champs selon vos règles métier...
+
+    // Assurez-vous que la liste des médias n'est pas vide si votre logique le requiert
+    if (realEstate.getMediaList() == null || realEstate.getMediaList().isEmpty()) {
+        Log.e("RealEstateViewModel", "Au moins un média est requis pour le bien immobilier.");
+        return false;
+    }
+
+    // Tous les champs requis sont valides
+    return true;
+}
+
+
+    public void createOrUpdateRealEstate(RealEstate realEstate) {
+        if (!validateRealEstateData(realEstate)) {
+            saveOperationComplete.postValue(false);
+            Log.e("RealEstateViewModel", "Échec de la validation des données RealEstate.");
+            return;
+        }
+        LiveData<Long> realEstateIdLiveData = realEstateRepo.createOrUpdateRealEstate(realEstate);
+        realEstateIdLiveData.observeForever(newId -> {
+            if (newId != null && newId > 0) {
+                // Si newId est non-null et > 0, cela signifie que l'opération a réussi
+                realEstate.setId(newId); // Mettre à jour l'ID de l'objet RealEstate
+                // Gérer la mise à jour des médias associés ici
+                if (realEstate.getMediaList() != null && !realEstate.getMediaList().isEmpty()) {
+                    for (RealEstateMedia media : realEstate.getMediaList()) {
+                        media.setRealEstateId(newId);
+                        updateMedia(media); // Mise à jour ou ajout de chaque média associé
+                    }
+                }
+                saveOperationComplete.postValue(true);
+            } else {
+                // Si newId est null ou 0, l'opération a échoué
+                Log.e("RealEstateViewModel", "Échec de la création ou de la mise à jour du RealEstate.");
+                saveOperationComplete.postValue(false);
+            }
+        });
+    }
+
+
+
+
+
+   public void addNewMedia(RealEstate realEstate, long realEstateId) {
+        if (realEstate.getMediaList() != null) {
+            realEstate.getMediaList().forEach(media -> {
                 media.setRealEstateId(realEstateId);
                 executor.execute(() -> realEstateMediaRepo.addRealEstateMedia(media));
             });
@@ -97,26 +123,5 @@ public class RealEstateViewModel extends ViewModel {
         return realEstateRepo.filterRealEstates(name, maxSaleDate, minListingDate, maxPrice, minPrice, maxSurface, minSurface);
     }
 
-    public void updateEstateFeaturedMediaUrl(long realEstateId, String newUrl) {
-        executor.execute(() -> realEstateRepo.updateFeaturedMediaUrl(realEstateId, newUrl));
-    }
-
-
-
-    public void updateRealEstateSaleDate(long realEstateId, Date saleDate) {
-        executor.execute(() -> {
-            RealEstate realEstate = realEstateRepo.getRealEstateById(realEstateId).getValue();
-            if (realEstate != null) {
-                realEstate.setSaleDate(saleDate);
-                realEstate.setSold(true); // Mark the property as sold
-                realEstateRepo.createOrUpdateRealEstate(realEstate);
-                Log.d("RealEstateViewModel", "Updated sale date for RealEstate ID: " + realEstateId);
-                // Optionally post a value to a LiveData to notify observers of the update completion
-            } else {
-                Log.e("RealEstateViewModel", "RealEstate not found with ID: " + realEstateId);
-                // Handle the case where the RealEstate object was not found
-            }
-        });
-    }
 
 }

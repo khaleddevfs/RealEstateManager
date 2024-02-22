@@ -7,7 +7,6 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 /*
@@ -116,14 +115,7 @@ public class RealEstate implements Parcelable {
  */
 
 import android.content.ContentValues;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.util.Log;
-
-import androidx.room.ColumnInfo;
-import androidx.room.Entity;
-import androidx.room.Ignore;
-import androidx.room.PrimaryKey;
 
 
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -131,9 +123,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -428,12 +418,12 @@ public class RealEstate implements Parcelable {
         this.description = description;
     }
 
-    public long getID() {
+    public long getId() {
         return id;
     }
 
-    public void setID(long ID) {
-        this.id = ID;
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getLocation() {
@@ -551,7 +541,7 @@ public class RealEstate implements Parcelable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getID());
+        return Objects.hash(getId());
     }
 
     public static RealEstate fromQueryDocumentSnapshot(QueryDocumentSnapshot document) {
@@ -582,7 +572,7 @@ public class RealEstate implements Parcelable {
         bedrooms = toClone.getBedrooms();
         bathrooms = toClone.getBathrooms();
         description = toClone.getDescription();
-        id = toClone.getID();
+        id = toClone.getId();
         saleDate = toClone.getSaleDate();
         agentName = toClone.getAgentName();
         featuredMediaUrl = toClone.getFeaturedMediaUrl();
@@ -602,7 +592,7 @@ public class RealEstate implements Parcelable {
     public static RealEstate fromContentValues(ContentValues values) {
         final RealEstate estate = new RealEstate();
 
-        if(values.containsKey("id")) estate.setID(values.getAsLong("id"));
+        if(values.containsKey("id")) estate.setId(values.getAsLong("id"));
 
         if(values.containsKey("name")) estate.setName(values.getAsString("name"));
 
@@ -639,13 +629,15 @@ public class RealEstate implements Parcelable {
     }
 
 
-    public long getId() {
+  /*  public long getId() {
         return id;
     }
 
     public void setId(long id) {
         this.id = id;
     }
+
+   */
 
     // Getter pour isSold
     public boolean isSold() {

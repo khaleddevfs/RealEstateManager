@@ -71,7 +71,7 @@ public class MapActivity extends AppCompatActivity implements MapFragment.OnMark
 
     @Override
     public void onMarkerClick(RealEstate realEstate) {
-        Log.d(TAG, "onMarkerClick: Marker clicked for estate: " + realEstate.getID());
+        Log.d(TAG, "onMarkerClick: Marker clicked for estate: " + realEstate.getId());
         goToDetailsFragment(realEstate);
     }
 

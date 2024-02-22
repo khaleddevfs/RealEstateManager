@@ -52,7 +52,7 @@ public class RealEstateMediaDaoTest extends TestCase {
 
     public void testAddMedia() throws Throwable {
         RealEstate estate = new RealEstate();
-        estate.setID(1000);
+        estate.setId(1000);
 
         testDb.realEstateDao().createOrUpdateRealEstate(estate);
 
@@ -63,7 +63,7 @@ public class RealEstateMediaDaoTest extends TestCase {
     public void testInsertMultipleMedia() throws Throwable {
         List<RealEstateMedia> medias = new ArrayList<>();
         RealEstate estate = new RealEstate();
-        estate.setID(1000);
+        estate.setId(1000);
 
         testDb.realEstateDao().createOrUpdateRealEstate(estate);
 
@@ -81,7 +81,7 @@ public class RealEstateMediaDaoTest extends TestCase {
     public void testDeleteMedia() throws Throwable {
         List<RealEstateMedia> medias = new ArrayList<>();
         RealEstate estate = new RealEstate();
-        estate.setID(1000);
+        estate.setId(1000);
 
         testDb.realEstateDao().createOrUpdateRealEstate(estate);
 
@@ -101,7 +101,7 @@ public class RealEstateMediaDaoTest extends TestCase {
     public void testDeleteAllMediaByRealEstateId() throws Throwable {
         List<RealEstateMedia> medias = new ArrayList<>();
         RealEstate estate = new RealEstate();
-        estate.setID(1000);
+        estate.setId(1000);
 
         testDb.realEstateDao().createOrUpdateRealEstate(estate);
 

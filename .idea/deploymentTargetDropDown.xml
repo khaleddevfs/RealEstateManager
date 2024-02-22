@@ -38,7 +38,20 @@
         </State>
       </entry>
       <entry key="UtilsInstrumentedTest">
-        <State />
+        <State>
+          <targetSelectedWithDropDown>
+            <Target>
+              <type value="QUICK_BOOT_TARGET" />
+              <deviceKey>
+                <Key>
+                  <type value="VIRTUAL_DEVICE_PATH" />
+                  <value value="C:\Users\khale\.android\avd\Pixel_Tablet_API_30.avd" />
+                </Key>
+              </deviceKey>
+            </Target>
+          </targetSelectedWithDropDown>
+          <timeTargetWasSelectedWithDropDown value="2024-02-22T11:08:56.818847600Z" />
+        </State>
       </entry>
       <entry key="app">
         <State>
@@ -53,7 +66,7 @@
               </deviceKey>
             </Target>
           </targetSelectedWithDropDown>
-          <timeTargetWasSelectedWithDropDown value="2024-02-21T13:21:28.920562500Z" />
+          <timeTargetWasSelectedWithDropDown value="2024-02-22T11:17:22.579091500Z" />
         </State>
       </entry>
       <entry key="getTodayDate()">

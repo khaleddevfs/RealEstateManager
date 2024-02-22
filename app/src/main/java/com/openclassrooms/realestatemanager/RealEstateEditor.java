@@ -1,15 +1,10 @@
 package com.openclassrooms.realestatemanager;
 
 
-import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
-
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.content.ClipData;
 import android.content.ContentResolver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -31,25 +26,18 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.gms.common.api.Status;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.api.model.TypeFilter;
-import com.google.android.libraries.places.widget.Autocomplete;
-import com.google.android.libraries.places.widget.AutocompleteActivity;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
-import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.openclassrooms.realestatemanager.adapters.RealEstateEditorRvAdapter;
 import com.openclassrooms.realestatemanager.adapters.RealEstateEditorRvViewHolder;
 import com.openclassrooms.realestatemanager.database.SaveRealEstateDB;
 import com.openclassrooms.realestatemanager.databinding.ActivityRealEstateEditorBinding;
-import com.openclassrooms.realestatemanager.fragments.MapFragment;
 import com.openclassrooms.realestatemanager.injection.ViewModelFactory;
 import com.openclassrooms.realestatemanager.models.RealEstate;
 import com.openclassrooms.realestatemanager.models.RealEstateMedia;
@@ -67,6 +55,12 @@ import java.util.Objects;
 import java.util.UUID;
 
 public class RealEstateEditor extends AppCompatActivity {
+
+
+    private static final String TAG = "RealEstateEditor";
+
+
+
 
     private static final int REQUEST_PERMISSION_CODE = 1;
     private RealEstateViewModel realEstateViewModel;
@@ -117,11 +111,19 @@ public class RealEstateEditor extends AppCompatActivity {
         });
 
         if (getIntent().hasExtra("REAL_ESTATE_TO_EDIT")) {
+            realEstate = getIntent().getParcelableExtra("REAL_ESTATE_TO_EDIT");
+            Log.d(TAG, "Modifying existing RealEstate: " + realEstate.toString());
+        } else {
+            realEstate = new RealEstate(); // Assurez-vous de créer une nouvelle instance si nécessaire
+            Log.d(TAG, "Creating new RealEstate instance");
+        }
+
+        if (getIntent().hasExtra("REAL_ESTATE_TO_EDIT")) {
             RealEstate realEstateToEdit = getIntent().getParcelableExtra("REAL_ESTATE_TO_EDIT");
             Log.d("lodi", "RealEstate received: " + realEstateToEdit.toString());
             // Utilisez realEstateToEdit pour remplir les champs d'édition...
         } else {
-            Log.d("lodi", "No RealEstate data received");
+            Log.d(TAG, "No RealEstate data received");
         }
     }
 
@@ -212,11 +214,6 @@ public class RealEstateEditor extends AppCompatActivity {
         binding.etRegion.setOnFocusChangeListener(listener);
     }
 
-    private void validateEditText(EditText editText) {
-        if (editText.getText().toString().trim().isEmpty()) {
-            editText.setError("Ce champ ne peut pas être vide");
-        }
-    }
 
     // Méthodes de chargement et de sauvegarde des données...
     private void loadRealEstateData() {
@@ -237,10 +234,12 @@ public class RealEstateEditor extends AppCompatActivity {
       //  binding.btSave.setOnClickListener();
     }
 
-    private void saveRealEstateData() {
+   /* private void saveRealEstateData() {
         Log.d("RealEstateEditor", "Entering saveRealEstateData method");
-        Log.d("lodi", "Starting saveRealEstateData");
 
+
+
+        Log.d(TAG, "Starting saveRealEstateData");
 
 
         if (realEstate == null) {
@@ -267,8 +266,18 @@ public class RealEstateEditor extends AppCompatActivity {
             Log.d("lodi", "RealEstate saved with ID: " + realEstateId);
 
 
-            if (realEstate.getID() == 0) {
-                realEstate.setID(realEstateId);
+
+            // Log before saving
+            if (realEstate != null) {
+                Log.d(TAG, "Saving RealEstate: " + realEstate.toString());
+            } else {
+                Log.d(TAG, "RealEstate object is null. Cannot save data.");
+                return;
+            }
+
+
+            if (realEstate.getId() == 0) {
+                realEstate.setId(realEstateId);
                 for (RealEstateMedia media : mediaList) {
                     media.setRealEstateId(realEstateId);
                 }
@@ -286,6 +295,56 @@ public class RealEstateEditor extends AppCompatActivity {
                 Toast.makeText(RealEstateEditor.this, "Real Estate saved successfully", Toast.LENGTH_SHORT).show();
                 Log.d("lodi", "Real Estate saved successfully, finishing activity");
 
+                finishWithResult();
+            });
+        }).start();
+
+        Log.d(TAG, "RealEstate saved successfully.");
+
+    }
+
+    */
+
+
+    private void saveRealEstateData() {
+        Log.d(TAG, "Starting saveRealEstateData");
+
+        // Assurez-vous que realEstate est initialisé
+        if (realEstate == null) {
+            realEstate = createRealEstate();
+            Log.d(TAG, "Creating new RealEstate instance");
+        } else {
+            Log.d(TAG, "Using existing RealEstate instance");
+        }
+
+        setAdditionalRealEstateProperties(realEstate);
+
+        new Thread(() -> {
+            Log.d(TAG, "Saving RealEstate in background thread");
+
+            SaveRealEstateDB database = SaveRealEstateDB.getInstance(getApplicationContext());
+            long realEstateId;
+
+            // Crée ou met à jour RealEstate et récupère son ID
+            if (realEstate.getId() == 0) {
+                realEstateId = database.realEstateDao().createOrUpdateRealEstate(realEstate);
+                realEstate.setId(realEstateId); // Assurez-vous que l'ID est mis à jour dans l'instance actuelle
+            } else {
+                database.realEstateDao().createOrUpdateRealEstate(realEstate);
+                realEstateId = realEstate.getId(); // Utilise l'ID existant
+            }
+
+            Log.d(TAG, "RealEstate saved with ID: " + realEstateId);
+
+            // Assurez que chaque RealEstateMedia a l'ID correct de RealEstate
+            for (RealEstateMedia media : mediaList) {
+                media.setRealEstateId(realEstateId);
+                database.realEstateMediaDao().addMedia(media);
+                Log.d(TAG, "Saved media with path: " + media.getMediaUrl());
+            }
+
+            runOnUiThread(() -> {
+                Toast.makeText(RealEstateEditor.this, "Real Estate saved successfully", Toast.LENGTH_SHORT).show();
                 finishWithResult();
             });
         }).start();
@@ -339,7 +398,7 @@ public class RealEstateEditor extends AppCompatActivity {
         if (realEstate == null) {
             media = new RealEstateMedia(path, "");
         } else {
-            media = new RealEstateMedia(realEstate.getID(), path, "");
+            media = new RealEstateMedia(realEstate.getId(), path, "");
         }
         mediaList.add(media);
         adapter.setRealEstateMediaList(mediaList);
@@ -471,7 +530,7 @@ public class RealEstateEditor extends AppCompatActivity {
         }
         finish();
     }
-
+/*
     private RealEstate createRealEstate() {
         RealEstate realEstate = new RealEstate();
 
@@ -498,31 +557,53 @@ public class RealEstateEditor extends AppCompatActivity {
 
     }
 
-    private void btSaveClick() {
-        updateMediaCaptions();
+ */
+
+    private RealEstate createRealEstate() {
+        RealEstate realEstate = new RealEstate();
+
+        realEstate.setName(binding.etName.getText().toString());
+        realEstate.setRegion(binding.etRegion.getText().toString());
+        realEstate.setDescription(binding.textInputEditTextDescription.getText().toString());
+        // Utilisez parseStringToInt pour une conversion sécurisée
+        realEstate.setPrice(parseStringToInt(binding.etPrice.getText().toString()));
+        // Utilisez les informations de localisation sélectionnées si disponibles
+        if (selectedLatitude != null && selectedLongitude != null) {
+            realEstate.setLatitude(selectedLatitude);
+            realEstate.setLongitude(selectedLongitude);
+            realEstate.setAddress(selectedAddress); // Définissez l'adresse sélectionnée
+        }
+        realEstate.setSurface(parseStringToInt(binding.etSurface.getText().toString()));
+        realEstate.setRooms(parseStringToInt(binding.etRooms.getText().toString()));
+        realEstate.setBedrooms(parseStringToInt(binding.etBedrooms.getText().toString()));
+        realEstate.setBathrooms(parseStringToInt(binding.etBathrooms.getText().toString()));
+        realEstate.setMediaList(mediaList);
+        realEstate.setAgentName(selectedAgentName);
+        // S'assurer que listingDate est défini
+        if (realEstate.getListingDate() == null) {
+            realEstate.setListingDate(new Date()); // Définir la date actuelle comme valeur par défaut
+        }
+
+        return realEstate;
+    }
+
+
+        private void btSaveClick() {
+        Log.d(TAG, "Save button clicked. Attempting to save RealEstate data.");
         RealEstate realEstate = createRealEstate();
         setAdditionalRealEstateProperties(realEstate);
         realEstateViewModel.createOrUpdateRealEstate(realEstate);
 
+
     }
 
     private void setAdditionalRealEstateProperties(RealEstate realEstate) {
-        if (realEstate.getID() == 0) {
+        if (realEstate.getId() == 0) {
+            Log.d(TAG, "Setting listing date for new RealEstate.");
             realEstate.setListingDate(new Date());
         }
     }
 
-    private void updateMediaCaptions() {
-        for (int index = 0; index < mediaList.size(); index++) {
-            RealEstateMedia media = mediaList.get(index);
-            if (index < binding.rvSelectedPhotos.getChildCount()) {
-                String caption = ((RealEstateEditorRvViewHolder) Objects.requireNonNull(
-                        binding.rvSelectedPhotos.findViewHolderForAdapterPosition(index)))
-                        .getCaption().getText().toString();
-                media.setMediaCaption(caption);
-            }
-        }
-    }
 
 
     private void photoOrGalleryDialog() {
@@ -533,8 +614,40 @@ public class RealEstateEditor extends AppCompatActivity {
 
 
 
+   private boolean validateEditText(EditText editText) {
+        if (editText.getText().toString().trim().isEmpty()) {
+            editText.setError("Ce champ ne peut pas être vide");
+            return false;
+        }
+        return true;
+    }
 
 
+
+
+
+    private int parseStringToInt(String input) {
+        if (input == null || input.trim().isEmpty()) {
+            // Vous pouvez retourner une valeur par défaut ou lancer une exception personnalisée si la valeur est obligatoire
+            return 0; // Retourne une valeur par défaut, par exemple 0
+        }
+        try {
+            return Integer.parseInt(input);
+        } catch (NumberFormatException e) {
+            Log.e(TAG, "NumberFormatException: For input string: \"" + input + "\"", e);
+            return 0; // ou gérer l'erreur différemment
+        }
+    }
 
 }
+
+
+
+
+
+
+
+
+
+
 

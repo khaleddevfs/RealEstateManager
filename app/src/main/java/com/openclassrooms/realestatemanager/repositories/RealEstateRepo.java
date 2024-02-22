@@ -1,6 +1,9 @@
 package com.openclassrooms.realestatemanager.repositories;
 
+import android.util.Log;
+
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
 import com.openclassrooms.realestatemanager.database.RealEstateDao;
 import com.openclassrooms.realestatemanager.models.RealEstate;
@@ -33,8 +36,30 @@ public class RealEstateRepo {
     /**
      * Create or update a real estate.
      */
-    public long createOrUpdateRealEstate(RealEstate realEstate) {
-        return realEstateDao.createOrUpdateRealEstate(realEstate);
+    /*
+    public void createOrUpdateRealEstate(RealEstate realEstate) {
+        if (realEstate == null) {
+            Log.e("RealEstateRepo", "Tentative de sauvegarde d'un RealEstate null.");
+            return; // Arrêtez l'exécution si realEstate est null.
+        }
+        executor.execute(() -> {
+            realEstateDao.createOrUpdateRealEstate(realEstate);
+            Log.d("RealEstateRepo", "RealEstate créé ou mis à jour avec succès.");
+        });
+    }
+
+     */
+    public LiveData<Long> createOrUpdateRealEstate(RealEstate realEstate) {
+        MutableLiveData<Long> resultId = new MutableLiveData<>();
+        if (realEstate == null) {
+            resultId.postValue(null); // Post null if realEstate is null
+            return resultId;
+        }
+        executor.execute(() -> {
+            long id = realEstateDao.createOrUpdateRealEstate(realEstate);
+            resultId.postValue(id); // Post the result ID on the main thread
+        });
+        return resultId;
     }
 
 

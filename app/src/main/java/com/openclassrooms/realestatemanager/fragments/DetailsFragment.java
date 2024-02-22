@@ -172,7 +172,7 @@ public class DetailsFragment extends Fragment implements OnMapCreated, OnItemCli
 
 
         if (realEstate != null) {
-            viewModel.getRealEstateMediasByID(realEstate.getID()).observe(getViewLifecycleOwner(), new Observer<List<RealEstateMedia>>() {
+            viewModel.getRealEstateMediasByID(realEstate.getId()).observe(getViewLifecycleOwner(), new Observer<List<RealEstateMedia>>() {
                 @SuppressLint("NotifyDataSetChanged")
                 @Override
                 public void onChanged(List<RealEstateMedia> mediaList) {
@@ -225,7 +225,7 @@ public class DetailsFragment extends Fragment implements OnMapCreated, OnItemCli
 
 
     private void updatePropertyDetails() {
-        liveData = viewModel.getRealEstateMediasByID(realEstate.getID());
+        liveData = viewModel.getRealEstateMediasByID(realEstate.getId());
         observer = this::mediaObserver;
         liveData.observe(getViewLifecycleOwner(), observer);
         binding.address.setText(realEstate.getAddress());
